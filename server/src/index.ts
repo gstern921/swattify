@@ -1,7 +1,5 @@
 #!/usr/bin/env node
-import path from 'path';
 
-require('dotenv').config(path.join(__dirname, '.env'));
 /**
  * Module dependencies.
  */
@@ -10,16 +8,14 @@ import debug from 'debug';
 debug('server:server');
 import http from 'http';
 
-import DATABASE_URL from './config/db';
-
-console.log(DATABASE_URL);
-console.log(process.env.DATABASE_URL);
+import db from './config/db';
+import { PORT } from './config/app.config';
 
 /**
  * Get port from environment and store in Express.
  */
 
-const port = normalizePort(process.env.PORT || '3000');
+const port = normalizePort(PORT);
 app.set('trust proxy', 1);
 app.set('port', port);
 

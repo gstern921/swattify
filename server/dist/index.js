@@ -4,16 +4,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const path_1 = __importDefault(require("path"));
-require('dotenv').config(path_1.default.join(__dirname, '.env'));
 const app_1 = __importDefault(require("./app"));
 const debug_1 = __importDefault(require("debug"));
 debug_1.default('server:server');
 const http_1 = __importDefault(require("http"));
-const db_1 = __importDefault(require("./config/db"));
-console.log(db_1.default);
-console.log(process.env.DATABASE_URL);
-const port = normalizePort(process.env.PORT || '3000');
+const app_config_1 = require("./config/app.config");
+const port = normalizePort(app_config_1.PORT);
 app_1.default.set('trust proxy', 1);
 app_1.default.set('port', port);
 const server = http_1.default.createServer(app_1.default);
