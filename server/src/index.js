@@ -36,7 +36,7 @@ db.authenticate().then(() => {
    * Normalize a port into a number, string, or false.
    */
 
-  function normalizePort(val: string) {
+  function normalizePort(val) {
     var port = parseInt(val, 10);
 
     if (isNaN(port)) {
@@ -56,7 +56,7 @@ db.authenticate().then(() => {
    * Event listener for HTTP server "error" event.
    */
 
-  function onError(error: NodeJS.ErrnoException) {
+  function onError(error) {
     if (error.syscall !== 'listen') {
       throw error;
     }

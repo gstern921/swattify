@@ -1,16 +1,15 @@
 import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_CALLBACK_URL } from '../config/app.config';
 import { Strategy as GitHubStrategy } from 'passport-github2';
-import { PassportStatic } from 'passport';
 
-export default (passport: PassportStatic) => {
+export default (passport) => {
   passport.use(
     new GitHubStrategy(
       {
-        clientID: GITHUB_CLIENT_ID as string,
-        clientSecret: GITHUB_CLIENT_SECRET as string,
+        clientID: GITHUB_CLIENT_ID,
+        clientSecret: GITHUB_CLIENT_SECRET,
         callbackURL: GITHUB_CALLBACK_URL,
       },
-      function (accessToken: string, refreshToken: string, profile: Map<string, any>, done: Function) {
+      function (accessToken, refreshToken, profile, done) {
         console.log(accessToken);
         console.log(refreshToken);
         console.log(profile);
