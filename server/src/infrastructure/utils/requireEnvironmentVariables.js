@@ -1,13 +1,14 @@
-const requireEnvironmentVariables = (requiredVariables: string[]) => {
-  let messages = [];
-  for (let variable of requiredVariables) {
+const requireEnvironmentVariables = (requiredVariables = []) => {
+  const messages = [];
+  requiredVariables.forEach((variable) => {
     if (process.env[variable] === undefined) {
       messages.push(variable);
     }
-  }
+  });
+
   if (messages.length) {
     throw new Error(`Required Environment Variables ${messages.join(', ')} missing!`);
   }
 };
 
-export default requireEnvironmentVariables;
+module.exports = requireEnvironmentVariables;

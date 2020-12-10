@@ -1,90 +1,44 @@
-#!/usr/bin/env node
-import path from 'path';
-require('dotenv').config({ path: path.join(__dirname, '..', 'src', '.env') });
+process.on('uncaughtException', (err) => {
+  console.log(`Uncaught Exception! 💥 ${err.name}, ${err.message}`);
 
-import app from './app';
-import debug from 'debug';
-debug('server:server');
-import http from 'http';
+  process.exit(1);
+});
 
-import { PORT } from './config/app.config';
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, 'config', '.env') });
 
-import requireEnvironmentVariables from './utils/requireEnvironmentVariables';
-import { REQUIRED_ENVIRONMENT_VARIABLES } from './config/app.config';
+const app = require('./app');
+
+const { PORT, IS_PROD } = require('./config/app.config');
+const { NODE_ENV } = require('./config/app.config');
+
+const requireEnvironmentVariables = require('./infrastructure/utils/requireEnvironmentVariables');
+const { REQUIRED_ENVIRONMENT_VARIABLES } = require('./config/app.config');
+
+const User = require('./core/user/UserModel');
+
 requireEnvironmentVariables(REQUIRED_ENVIRONMENT_VARIABLES);
 
-import db from './config/db';
+const db = require('./infrastructure/db/db');
 
-db.authenticate().then(() => {
-  /**
-   * Create HTTP server.
-   */
-  const port = normalizePort(PORT);
-  app.set('port', port);
+db.authenticate().then(async () => {
+  console.log('connected to database...');
+  // await db.sync({ force: !IS_PROD });
+  const server = app.listen(PORT, () => {
+    console.log(`Running in ${NODE_ENV} mode on port ${PORT}`);
+  });
 
-  const server = http.createServer(app);
-
-  /**
-   * Listen on provided port, on all network interfaces.
-   */
-
-  server.listen(port);
-  server.on('error', onError);
-  server.on('listening', onListening);
-
-  /**
-   * Normalize a port into a number, string, or false.
-   */
-
-  function normalizePort(val) {
-    var port = parseInt(val, 10);
-
-    if (isNaN(port)) {
-      // named pipe
-      return val;
+  process.on('unhandledRejection', (err) => {
+    console.log(`Unhandled Rejection! 💥 ${err.name}, ${err.message}`);
+    if (server && typeof server.close === 'function') {
+      server.close(() => process.exit(1));
     }
+  });
 
-    if (port >= 0) {
-      // port number
-      return port;
+  process.on('SIGTERM', (err) => {
+    console.log('👋 SIGTERM RECEIVED! Shutting down gracefully');
+    if (server && typeof server.close === 'function') {
+      server.close(() => console.log('💥 Process terminated!'));
     }
-
-    return false;
-  }
-
-  /**
-   * Event listener for HTTP server "error" event.
-   */
-
-  function onError(error) {
-    if (error.syscall !== 'listen') {
-      throw error;
-    }
-
-    var bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
-
-    // handle specific listen errors with friendly messages
-    switch (error.code) {
-      case 'EACCES':
-        console.error(bind + ' requires elevated privileges');
-        process.exit(1);
-        break;
-      case 'EADDRINUSE':
-        console.error(bind + ' is already in use');
-        process.exit(1);
-        break;
-      default:
-        throw error;
-    }
-  }
-
-  /**
-   * Event listener for HTTP server "listening" event.
-   */
-
-  function onListening() {
-    var addr = server.address();
-    var bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr?.port;
-    debug('Listening on ' + bind);
-  }
+  });
 });

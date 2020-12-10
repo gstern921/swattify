@@ -2,22 +2,20 @@ const express = require('express');
 const logger = require('morgan');
 const cors = require('cors');
 const session = require('express-session');
+const passport = require('passport');
+const cookieParser = require('cookie-parser');
 const connectSequelize = require('connect-session-sequelize');
-const db = require('./config/db');
-const authRouter = require('./routes/auth');
+const db = require('./infrastructure/db/db');
+const authRouter = require('./infrastructure/auth/auth-router');
 const configPassport = require('./config/passport');
 
 const { IS_PROD, CLIENT_URL, SESSION_COOKIE_NAME, SESSION_SECRET } = require('./config/app.config');
-const passport = require('passport');
+
 // import passport from 'passport';
 // import session from 'express-session';
 
-const a = 1;
-
 const app = express();
 app.set('trust proxy', 1);
-
-configPassport(passport);
 
 if (!IS_PROD) {
   app.use(logger('dev'));
@@ -25,7 +23,9 @@ if (!IS_PROD) {
 app.use(cors({ origin: CLIENT_URL, credentials: true }));
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
+
+// app.use(cookieParser());
 
 const SequelizeStore = connectSequelize(session.Store);
 
@@ -35,7 +35,6 @@ app.use(
     secret: SESSION_SECRET,
     cookie: {
       secure: IS_PROD,
-      sameSite: 'lax',
       httpOnly: true,
     },
     resave: false,
@@ -45,12 +44,20 @@ app.use(
   }),
 );
 
+configPassport(passport);
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.get('/', (_req, res, _next) => {
-  res.send('hello');
+app.use((req, res, next) => {
+  console.log('req.user ', req.user);
+  console.log('cookies:', req.cookies);
+  // console.log('authenticated?: ', req.isAuthenticated());
+  // console.log('unauthenticated?: ', req.isUnauthenticated());
+  // console.log('co');
+  next();
 });
+
+app.use('/', require('./indexRouter'));
 
 // app.use(express.static(path.join(__dirname, 'public')));
 
@@ -58,4 +65,4 @@ app.get('/', (_req, res, _next) => {
 // app.use('/users', require('./routes/users'));
 app.use('/auth', authRouter);
 
-export default app;
+module.exports = app;

@@ -1,10 +1,9 @@
-import {} from '../constants/constants';
-
 const { NODE_ENV = 'development' } = process.env;
+module.exports.NODE_ENV = NODE_ENV;
 
-export const { PORT = '3001' } = process.env;
+module.exports.PORT = process.env.PORT || '3001';
 
-export const REQUIRED_ENVIRONMENT_VARIABLES = [
+module.exports.REQUIRED_ENVIRONMENT_VARIABLES = [
   'PORT',
   'DATABASE_URL',
   'SESSION_COOKIE_NAME',
@@ -12,17 +11,17 @@ export const REQUIRED_ENVIRONMENT_VARIABLES = [
   'GITHUB_CLIENT_ID',
   'GITHUB_CLIENT_SECRET',
 ];
-export const IS_PROD = NODE_ENV.toLowerCase() === 'production';
-export const { DATABASE_URL } = process.env;
-export const CLIENT_URL = 'http://localhost:3000';
-export const { SESSION_COOKIE_NAME } = process.env;
-export const { SESSION_SECRET } = process.env;
-export const { GITHUB_CLIENT_ID } = process.env;
-export const { GITHUB_CLIENT_SECRET } = process.env;
-export const GITHUB_CALLBACK_URL = 'http://localhost:3001/auth/github/callback';
+module.exports.IS_PROD = NODE_ENV.toLowerCase() === 'production';
+module.exports.DATABASE_URL = process.env.DATABASE_URL;
+module.exports.CLIENT_URL = 'http://localhost:3000';
+module.exports.SESSION_COOKIE_NAME = process.env.SESSION_COOKIE_NAME;
+module.exports.SESSION_SECRET = process.env.SESSION_SECRET;
+module.exports.GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
+module.exports.GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
+module.exports.GITHUB_CALLBACK_URL = 'http://localhost:3001/auth/github/callback';
 
-export const BCRYPT_SALT_ROUNDS = 12;
+module.exports.BCRYPT_SALT_ROUNDS = 12;
 
-export const SUCCESS = 'success';
-export const FAIL = 'fail';
-export const ERROR = 'error';
+module.exports.SUCCESS = 'success';
+module.exports.FAIL = 'fail';
+module.exports.ERROR = 'error';

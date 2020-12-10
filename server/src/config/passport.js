@@ -1,7 +1,8 @@
-import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_CALLBACK_URL } from '../config/app.config';
-import { Strategy as GitHubStrategy } from 'passport-github2';
+const { Strategy: GitHubStrategy } = require('passport-github2');
+const { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_CALLBACK_URL } = require('./app.config');
+const User = require('../core/user/UserModel');
 
-export default (passport) => {
+module.exports = (passport) => {
   passport.use(
     new GitHubStrategy(
       {
@@ -9,27 +10,42 @@ export default (passport) => {
         clientSecret: GITHUB_CLIENT_SECRET,
         callbackURL: GITHUB_CALLBACK_URL,
       },
-      function (accessToken, refreshToken, profile, done) {
-        console.log(accessToken);
-        console.log(refreshToken);
-        console.log(profile);
-        done(null, {});
-        // let err = null;
-        // User.findOrCreate({ githubId: profile.id }, function (err, user) {
-        // return done(err, user);
-        // }
-        // );
+      async (accessToken, refreshToken, profile, done) => {
+        let err = null;
+        let user = null;
+        try {
+          user = await User.findOrCreate({
+            where: {
+              id: profile.id,
+            },
+            defaults: {
+              name: profile.username,
+            },
+          });
+        } catch (error) {
+          err = error;
+        }
+
+        return done(err, user);
       },
     ),
   );
 
-  // passport.serializeUser((user, done) => {
-  //   done(null, user.id);
-  // });
+  passport.serializeUser((user, done) => {
+    // console.log('User', user);
+    done(null, user);
+  });
 
-  // passport.deserializeUser((id, done) =>
-  //   User.findById(id, (err, user) => {
-  //     done(err, user);
-  //   }),
-  // );
+  passport.deserializeUser(async (u, done) => {
+    let err = null;
+    let user = null;
+
+    try {
+      user = await User.findByPk(u[0].id);
+    } catch (error) {
+      err = error;
+    }
+
+    done(err, user);
+  });
 };
