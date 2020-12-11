@@ -14,7 +14,7 @@ module.exports = (passport) => {
         let err = null;
         let user = null;
         try {
-          user = await User.findOrCreate({
+          [user] = await User.findOrCreate({
             where: {
               id: profile.id,
             },
@@ -26,22 +26,25 @@ module.exports = (passport) => {
           err = error;
         }
 
+        // console.log('Strategy User: ', user);
+
         return done(err, user);
       },
     ),
   );
 
   passport.serializeUser((user, done) => {
-    // console.log('User', user);
-    done(null, user);
+    // console.log('User: ', user);
+    // console.log('typeof user: ', typeof user.id);
+    done(null, user.id);
   });
 
-  passport.deserializeUser(async (u, done) => {
+  passport.deserializeUser(async (id, done) => {
     let err = null;
     let user = null;
 
     try {
-      user = await User.findByPk(u[0].id);
+      user = await User.findByPk(id);
     } catch (error) {
       err = error;
     }

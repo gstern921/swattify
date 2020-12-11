@@ -18,7 +18,7 @@ module.exports.SESSION_COOKIE_NAME = process.env.SESSION_COOKIE_NAME;
 module.exports.SESSION_SECRET = process.env.SESSION_SECRET;
 module.exports.GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
 module.exports.GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
-module.exports.GITHUB_CALLBACK_URL = 'http://localhost:3001/auth/github/callback';
+module.exports.GITHUB_CALLBACK_URL = 'http://localhost:3000/';
 
 module.exports.BCRYPT_SALT_ROUNDS = 12;
 
