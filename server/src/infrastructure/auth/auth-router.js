@@ -1,7 +1,8 @@
 const express = require('express');
 const passport = require('passport');
 const { OK } = require('http-status-codes');
-const { SUCCESS } = require('../../config/app.config');
+const axios = require('axios');
+const { SUCCESS, GITHUB_CLIENT_SECRET, GITHUB_CLIENT_ID, GITHUB_CALLBACK_URL } = require('../../config/app.config');
 
 const router = express.Router();
 
@@ -22,8 +23,6 @@ router.get('/logout', (req, res) => {
 });
 
 router.get('/login', passport.authenticate('github'), (req, res) => {
-  console.log('req.user in /login: ', req.user);
-
   res.status(200).json(req.user);
 });
 
