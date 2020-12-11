@@ -62,3 +62,4 @@ typings/
 
 # Typescript output directory
 dist
+dump.rdb
