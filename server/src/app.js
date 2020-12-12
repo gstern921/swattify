@@ -10,9 +10,7 @@ const db = require('./infrastructure/db/db');
 const authRouter = require('./infrastructure/auth/auth-router');
 const configPassport = require('./config/passport');
 
-const {
-  IS_PROD, CLIENT_URL, SESSION_COOKIE_NAME, SESSION_SECRET
-} = require('./config/app.config');
+const { IS_PROD, CLIENT_URL, SESSION_COOKIE_NAME, SESSION_SECRET } = require('./config/app.config');
 
 const app = express();
 app.set('trust proxy', 1);
@@ -31,7 +29,10 @@ app.use(cookieParser());
 
 const SequelizeStore = connectSequelize(session.Store);
 
-
+app.use((req, res, next) => {
+  console.log(req.body);
+  next();
+});
 app.use(
   session({
     name: SESSION_COOKIE_NAME,

@@ -4,7 +4,7 @@ const User = require('../core/user/UserModel');
 module.exports = (passport) => {
   passport.use(
     'local-login',
-    new LocalStrategy(async (email, password, done) => {
+    new LocalStrategy({ usernameField: 'email' }, async (email, password, done) => {
       try {
         const user = await User.scope('withPassword').findOne({ where: { email } });
 
@@ -12,7 +12,7 @@ module.exports = (passport) => {
           return done(null, false);
         }
 
-        const passwordsMatch = await user.passwordMatches(password);
+        const passwordsMatch = await user.verifyPassword(password);
 
         if (!passwordsMatch) {
           return done(null, false);
@@ -46,7 +46,9 @@ module.exports = (passport) => {
         }
 
         try {
+          console.log('Attempting to create: ', user);
           user = await User.create({ name, email, password, image_url: imageUrl });
+          console.log('After create: ', user);
 
           if (!user) {
             return done(new Error('Unable to register'), null);
@@ -64,16 +66,21 @@ module.exports = (passport) => {
   );
 
   passport.serializeUser((user, done) => {
-    done(null, user.id);
+    console.log('serializeUser: ', user);
+    console.log('serializeUser, email: ', user.email);
+    done(null, user.email);
   });
 
-  passport.deserializeUser(async (id, done) => {
+  passport.deserializeUser(async (email, done) => {
+    console.log('deserializeUser, id: ', email);
     let err = null;
     let user = null;
 
     try {
-      user = await User.findByPk(id);
+      user = await User.findOne({ where: { email } });
+      console.log('deserializeUser, user: ', user);
     } catch (error) {
+      console.log('deserializeUser, error: ', error);
       err = error;
     }
 

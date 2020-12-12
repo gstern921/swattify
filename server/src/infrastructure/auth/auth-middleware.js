@@ -6,7 +6,7 @@ module.exports = {
     if (req.isAuthenticated()) {
       return next();
     }
-    res.redirect('/');
+    return res.status(BAD_REQUEST).json({ status: FAIL, message: 'You are not logged in' });
   },
   ensureGuest: (req, res, next) => {
     if (req.isAuthenticated()) {
