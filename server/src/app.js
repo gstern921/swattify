@@ -4,18 +4,15 @@ const logger = require('morgan');
 const cors = require('cors');
 const session = require('express-session');
 const passport = require('passport');
-const redis = require('redis');
 const cookieParser = require('cookie-parser');
 const connectSequelize = require('connect-session-sequelize');
-const connectRedis = require('connect-redis');
 const db = require('./infrastructure/db/db');
 const authRouter = require('./infrastructure/auth/auth-router');
 const configPassport = require('./config/passport');
 
-const { IS_PROD, CLIENT_URL, SESSION_COOKIE_NAME, SESSION_SECRET } = require('./config/app.config');
-
-// import passport from 'passport';
-// import session from 'express-session';
+const {
+  IS_PROD, CLIENT_URL, SESSION_COOKIE_NAME, SESSION_SECRET
+} = require('./config/app.config');
 
 const app = express();
 app.set('trust proxy', 1);
@@ -32,10 +29,8 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(cookieParser());
 
-const RedisStore = connectRedis(session);
-// const SequelizeStore = connectSequelize(session.Store);
+const SequelizeStore = connectSequelize(session.Store);
 
-const redisClient = redis.createClient();
 
 app.use(
   session({
@@ -47,7 +42,7 @@ app.use(
     },
     resave: false,
     saveUninitialized: false,
-    store: new RedisStore({ host: 'localhost', port: 6379, client: redisClient }),
+    store: new SequelizeStore({ db }),
   }),
 );
 

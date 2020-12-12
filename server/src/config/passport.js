@@ -1,36 +1,31 @@
-const { Strategy: GitHubStrategy } = require('passport-github2');
-const { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_CALLBACK_URL } = require('./app.config');
+const { Strategy: LocalStrategy } = require('passport-local');
+const bcryptjs = require('bcryptjs');
+const { Op } = require('sequelize');
 const User = require('../core/user/UserModel');
 
 module.exports = (passport) => {
   passport.use(
-    new GitHubStrategy(
-      {
-        clientID: GITHUB_CLIENT_ID,
-        clientSecret: GITHUB_CLIENT_SECRET,
-        callbackURL: GITHUB_CALLBACK_URL,
-      },
-      async (accessToken, refreshToken, profile, done) => {
-        let err = null;
-        let user = null;
-        try {
-          [user] = await User.findOrCreate({
-            where: {
-              id: profile.id,
-            },
-            defaults: {
-              name: profile.username,
-            },
-          });
-        } catch (error) {
-          err = error;
+    new LocalStrategy(async (usernameOrEmail, password, done) => {
+      try {
+        const user = await User.findOne({
+          where: {
+            [Op.or]: [{ username: usernameOrEmail, email: usernameOrEmail }],
+          },
+        });
+        if (!user) {
+          return done(null, false);
         }
 
-        // console.log('Strategy User: ', user);
-
-        return done(err, user);
-      },
-    ),
+        const passwordsMatch = await bcryptjs.compare(password, user.password);
+        if (!passwordsMatch) {
+          return done(null, false);
+        }
+        // Successful Log In
+        return done(null, user);
+      } catch (e) {
+        return done(e);
+      }
+    }),
   );
 
   passport.serializeUser((user, done) => {
