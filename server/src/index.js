@@ -22,6 +22,8 @@ requireEnvironmentVariables(REQUIRED_ENVIRONMENT_VARIABLES);
 const db = require('./infrastructure/db/db');
 
 db.authenticate().then(async () => {
+  await db.sync({force: !IS_PROD});
+
   console.log('connected to database...');
   // await db.sync({ force: !IS_PROD });
   const server = app.listen(PORT, () => {

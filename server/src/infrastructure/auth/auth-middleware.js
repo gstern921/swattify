@@ -1,13 +1,16 @@
+const { BAD_REQUEST } = require('http-status-codes');
+const { FAIL } = require('../../config/app.config');
+
 module.exports = {
-  ensureAuth: function (req, res, next) {
+  ensureAuth: (req, res, next) => {
     if (req.isAuthenticated()) {
       return next();
     }
     res.redirect('/');
   },
-  ensureGuest: function (req, res, next) {
+  ensureGuest: (req, res, next) => {
     if (req.isAuthenticated()) {
-      return res.redirect('/dashboard');
+      return res.status(BAD_REQUEST).json({ status: FAIL, message: 'You are already logged in' });
     }
     return next();
   },
