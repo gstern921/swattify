@@ -7,10 +7,18 @@ import {
   Switch,
 } from "react-router-dom";
 import axios from "axios";
-import { API_URL } from "./config/app.config";
-import qs from "qs";
+import {
+  API_LOGIN_ENDPOINT,
+  API_LOGOUT_ENDPOINT,
+  API_ME_ENDPOINT,
+  API_REGISTER_ENDPOINT,
+  API_URL,
+} from "./config/app.config";
 
-import React, { Component, useState } from "react";
+import NavBar from "./components/navbar/NavBar";
+
+import React, { Component } from "react";
+import LoginRegisterForm from "./containers/login-register-form/LoginRegisterForm";
 
 class App extends Component {
   constructor(props) {
@@ -23,29 +31,40 @@ class App extends Component {
   checkLogInStatus() {
     return axios({
       method: "GET",
-      url: `${API_URL}/auth/me`,
+      url: API_ME_ENDPOINT,
       headers: { "Content-Type": "application/json" },
       withCredentials: true,
     });
   }
 
-  logIn(email, password) {
+  loginWithCredentials = ({ email, password }) => (e) => {
+    e.preventDefault();
     return axios({
       method: "POST",
-      url: `${API_URL}/auth/register`,
+      url: API_LOGIN_ENDPOINT,
       headers: { "Content-Type": "application/json" },
       withCredentials: true,
       data: {
         email,
         password,
       },
-    });
-  }
+    })
+      .then((response) => {
+        // console.log(response);
+        this.setState(() => ({
+          user: response.data.user,
+        }));
+      })
+      .catch((err) => {
+        console.log(err.response);
+      });
+  };
 
-  register(credentials) {
+  registerWithCredentials = (credentials) => (e) => {
+    e.preventDefault();
     return axios({
       method: "POST",
-      url: `${API_URL}/auth/register`,
+      url: API_REGISTER_ENDPOINT,
       headers: { "Content-Type": "application/json" },
       withCredentials: true,
       data: {
@@ -54,15 +73,35 @@ class App extends Component {
         password: credentials.password,
         passwordConfirm: credentials.passwordConfirm,
       },
-    });
-  }
+    })
+      .then((response) => {
+        this.setState((prevState) => {
+          // console.log(prevState);
+          // console.log(response);
+          return {
+            user: response.data.user,
+          };
+        });
+      })
+      .catch((err) => {
+        console.log("error: ", err.response);
+      });
+  };
 
-  logOut() {
-    return axios(`${API_URL}/auth/logout`, {
+  logOut = (e) => {
+    e.preventDefault();
+    return axios(API_LOGOUT_ENDPOINT, {
       method: "GET",
       withCredentials: true,
-    });
-  }
+    })
+      .then(() => {
+        console.log(this);
+        this.setState(() => ({
+          user: null,
+        }));
+      })
+      .catch(console.error);
+  };
 
   componentDidMount() {
     this.checkLogInStatus()
@@ -74,110 +113,25 @@ class App extends Component {
       })
       .catch();
   }
+
   render() {
     const { user } = this.state;
     return (
       <>
+        <NavBar user={user} logOutHandler={this.logOut}></NavBar>
         {user ? (
           <>
             <h1>Logged In As</h1>
             <pre>{JSON.stringify(user, null, 2)}</pre>
           </>
         ) : (
-          <h1>Not Logged In</h1>
+          <>
+            <LoginRegisterForm
+              loginWithCredentials={this.loginWithCredentials}
+              registerWithCredentials={this.registerWithCredentials}
+            ></LoginRegisterForm>
+          </>
         )}
-        <h2>Register</h2>
-        <form
-          action={`${API_URL}/auth/register`}
-          method="POST"
-          onSubmit={(e) => {
-            const email = e.target.querySelector("input[name=email]").value;
-            const name = e.target.querySelector("input[name=name]").value;
-            const password = e.target.querySelector("input[name=password]")
-              .value;
-            const passwordConfirm = e.target.querySelector(
-              "input[name=passwordConfirm]"
-            ).value;
-            e.preventDefault();
-            this.register({ email, name, password, passwordConfirm })
-              .then((response) => {
-                this.setState((prevState) => {
-                  console.log(prevState);
-                  console.log(response);
-                  return {
-                    user: response.data.user,
-                  };
-                });
-              })
-              .catch((err) => {
-                console.log("error: ", err.response);
-              });
-          }}
-        >
-          <input name="email" placeholder="email" type="email" required />
-          <input name="name" placeholder="name" type="text" required />
-          <input
-            name="password"
-            placeholder="password"
-            type="password"
-            required
-          />
-          <input
-            name="passwordConfirm"
-            placeholder="confirm password"
-            type="password"
-            required
-          />
-          <button type="submit">Register</button>
-        </form>
-
-        <h2>Login</h2>
-        <form
-          action={`${API_URL}/auth/login`}
-          method="POST"
-          onSubmit={(e) => {
-            e.preventDefault();
-            const email = e.target.querySelector("input[name=email]").value;
-            const password = e.target.querySelector("input[name=password]")
-              .value;
-            this.logIn(email, password)
-              .then((response) => {
-                console.log(response);
-                this.setState(() => ({
-                  user: response.data.user,
-                }));
-              })
-              .catch((err) => {
-                console.log(err.response);
-              });
-          }}
-        >
-          <input name="email" placeholder="email" type="email" required />
-          <input
-            name="password"
-            placeholder="password"
-            type="password"
-            required
-          />
-          <button type="submit">Login</button>
-        </form>
-        <form>
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              this.logOut()
-                .then((response) => {
-                  this.setState(() => ({
-                    user: null,
-                  }));
-                })
-                .catch(console.error);
-            }}
-            type="submit"
-          >
-            Log Out
-          </button>
-        </form>
       </>
     );
   }
