@@ -16,16 +16,21 @@ const requireEnvironmentVariables = require('./infrastructure/utils/requireEnvir
 const { REQUIRED_ENVIRONMENT_VARIABLES } = require('./config/app.config');
 
 const User = require('./core/user/UserModel');
+const Project = require('./core/project/ProjectModel');
+const BugReport = require('./core/bug-report/BugReportModel');
 
 requireEnvironmentVariables(REQUIRED_ENVIRONMENT_VARIABLES);
 
 const db = require('./infrastructure/db/db');
 
 db.authenticate().then(async () => {
-  await db.sync({force: !IS_PROD});
+  try {
+    await db.sync({ force: !IS_PROD });
+  } catch (e) {
+    console.log(e);
+  }
 
-  console.log('connected to database...');
-  // await db.sync({ force: !IS_PROD });
+  console.log('Connected to database...');
   const server = app.listen(PORT, () => {
     console.log(`Running in ${NODE_ENV} mode on port ${PORT}`);
   });

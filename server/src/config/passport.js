@@ -37,18 +37,14 @@ module.exports = (passport) => {
           return done(new Error('User already exists'), null);
         }
 
-        if (!name || !email || !password || !passwordConfirm) {
-          return done(new Error('Missing registration information'), null);
-        }
-
         if (password !== passwordConfirm) {
           return done(new Error('Passwords do not match'), null);
         }
 
         try {
-          console.log('Attempting to create: ', user);
-          user = await User.create({ name, email, password, image_url: imageUrl });
-          console.log('After create: ', user);
+          // console.log('Attempting to create: ', user);
+          user = await User.create({ name, email, password, imageUrl });
+          // console.log('After create: ', user);
 
           if (!user) {
             return done(new Error('Unable to register'), null);
@@ -66,21 +62,21 @@ module.exports = (passport) => {
   );
 
   passport.serializeUser((user, done) => {
-    console.log('serializeUser: ', user);
-    console.log('serializeUser, email: ', user.email);
-    done(null, user.email);
+    // console.log('serializeUser: ', user);
+    // console.log('serializeUser, email: ', user.email);
+    done(null, user.id);
   });
 
-  passport.deserializeUser(async (email, done) => {
-    console.log('deserializeUser, id: ', email);
+  passport.deserializeUser(async (id, done) => {
+    // console.log('deserializeUser, id: ', email);
     let err = null;
     let user = null;
 
     try {
-      user = await User.findOne({ where: { email } });
-      console.log('deserializeUser, user: ', user);
+      user = await User.findByPk(id);
+      // console.log('deserializeUser, user: ', user);
     } catch (error) {
-      console.log('deserializeUser, error: ', error);
+      // console.log('deserializeUser, error: ', error);
       err = error;
     }
 

@@ -1,11 +1,17 @@
 const { Sequelize } = require('sequelize');
-const { DATABASE_URL } = require('../../config/app.config');
+const { DATABASE_URL, DEV_DATABASE_URL, IS_PROD } = require('../../config/app.config');
 
-const db = new Sequelize(DATABASE_URL, {
+const URL = IS_PROD ? DATABASE_URL : DEV_DATABASE_URL;
+
+const DB_OPTIONS = {
   dialect: 'postgres',
   protocol: 'postgres',
   logging: false,
-  dialectOptions: { ssl: { require: true, rejectUnauthorized: false } },
-});
+};
 
+if (IS_PROD) {
+  DB_OPTIONS.dialectOptions = { ssl: { require: true, rejectUnauthorized: false } };
+}
+
+const db = new Sequelize(URL, {});
 module.exports = db;

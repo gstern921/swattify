@@ -2,9 +2,11 @@ const { DataTypes } = require('sequelize');
 const bcryptjs = require('bcryptjs');
 const db = require('../../infrastructure/db/db');
 const { BCRYPT_SALT_ROUNDS, MINIMUM_PASSWORD_LENGTH, MAXIMUM_PASSWORD_LENGTH } = require('../../config/app.config');
+const trimString = require('../../infrastructure/utils/nullsafeTrimString');
+const toLower = require('../../infrastructure/utils/nullsafeToLowerCase');
 
 const User = db.define(
-  'user',
+  'users',
   {
     name: {
       type: DataTypes.STRING,
@@ -36,15 +38,13 @@ const User = db.define(
         },
       },
     },
-    image_url: {
+    imageUrl: {
       type: DataTypes.STRING,
       defaultValue: 'https://swattify-media.s3.amazonaws.com/default-user-icon-8.jpg',
-      validate: {
-        isUrl: true,
-      },
     },
   },
   {
+    paranoid: true,
     freezeTableName: true,
     defaultScope: {
       attributes: {
@@ -63,10 +63,11 @@ const User = db.define(
 
 User.addHook('beforeValidate', (instance) => {
   const user = instance;
-  user.email = user.email.toLowerCase().trim();
-  user.name = user.name.trim();
-  user.password = user.password.trim();
-  // console.log('beforeValidate: ', instance)
+  user.email = toLower(trimString(user.email));
+  user.name = trimString(user.name);
+  user.password = trimString(user.password);
+  user.imageUrl = trimString(user.imageUrl);
+  // console.log('beforeValidate: ', instance);
 });
 
 User.addHook('beforeCreate', async (instance) => {
@@ -77,6 +78,9 @@ User.addHook('beforeCreate', async (instance) => {
 });
 User.prototype.verifyPassword = async function (password) {
   // console.log(this);
+  if (!password) {
+    return false;
+  }
   const matches = await bcryptjs.compare(password, this.password);
   return matches;
 };

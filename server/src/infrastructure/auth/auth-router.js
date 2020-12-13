@@ -12,14 +12,15 @@ router.get('/me', ensureAuth, (req, res) => {
 });
 
 router.post('/register', ensureGuest, async (req, res, next) => {
-  console.log('in local register');
+  // console.log('in local register');
   passport.authenticate('local-register', (err, u) => {
-    console.log('in local register 2, err: ', err);
+    // console.log('in local register 2, err: ', err);
+    console.log(err);
     if (err) {
       return res.status(BAD_REQUEST).json({ status: ERROR, message: 'Registration Failed' });
     }
     req.logIn(u, (error) => {
-      console.log('error: ', error);
+      // console.log('error: ', error);
       // return res.status(OK).json({ status: SUCCESS, error, user: req.user });
       if (error) {
         return res.status(BAD_REQUEST).json({ status: ERROR, message: 'Unable to login after registering' });

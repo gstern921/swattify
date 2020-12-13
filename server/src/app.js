@@ -30,7 +30,7 @@ app.use(cookieParser());
 const SequelizeStore = connectSequelize(session.Store);
 
 app.use((req, res, next) => {
-  console.log(req.body);
+  // console.log(req.body);
   next();
 });
 app.use(
@@ -43,7 +43,7 @@ app.use(
     },
     resave: false,
     saveUninitialized: false,
-    store: new SequelizeStore({ db }),
+    store: new SequelizeStore({ db, tableName: 'sessions' }),
   }),
 );
 
@@ -61,6 +61,8 @@ app.use((req, res, next) => {
 });
 
 app.use('/', require('./indexRouter'));
+app.use('/projects', require('./core/project/project-router'));
+app.use('/bug-reports', require('./core/bug-report/bugReport-router'));
 
 // app.use('/', require('./routes/index'));
 // app.use('/users', require('./routes/users'));

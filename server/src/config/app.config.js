@@ -5,6 +5,8 @@ module.exports.PORT = process.env.PORT || '3001';
 
 module.exports.REQUIRED_ENVIRONMENT_VARIABLES = ['PORT', 'DATABASE_URL', 'SESSION_COOKIE_NAME', 'SESSION_SECRET'];
 module.exports.IS_PROD = NODE_ENV.toLowerCase() === 'production';
+module.exports.DEV_DATABASE_URL = 'postgres://gary:@localhost:5432/swattify';
+
 module.exports.DATABASE_URL = process.env.DATABASE_URL;
 module.exports.CLIENT_URL = 'http://localhost:3000';
 module.exports.SESSION_COOKIE_NAME = process.env.SESSION_COOKIE_NAME;
