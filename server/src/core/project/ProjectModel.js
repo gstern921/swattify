@@ -40,8 +40,9 @@ Project.addHook('beforeValidate', (instance) => {
   // console.log('beforeValidate: ', instance)
 });
 
-User.hasOne(Project, { as: 'projectOwner' });
-Project.belongsToMany(User, { through: 'userProjects', timestamps: false });
-User.belongsToMany(Project, { through: 'userProjects', timestamps: false });
+User.hasMany(Project, { as: 'projectOwner' });
+Project.belongsTo(User, { as: 'projectOwner' });
+Project.belongsToMany(User, { through: 'projectUsers', timestamps: false });
+User.belongsToMany(Project, { through: 'projectUsers', timestamps: false });
 
 module.exports = Project;

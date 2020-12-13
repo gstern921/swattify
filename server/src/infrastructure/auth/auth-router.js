@@ -7,10 +7,6 @@ const User = require('../../core/user/UserModel');
 
 const router = express.Router();
 
-router.get('/me', ensureAuth, (req, res) => {
-  res.status(OK).json({ status: SUCCESS, user: req.user });
-});
-
 router.post('/register', ensureGuest, async (req, res, next) => {
   // console.log('in local register');
   passport.authenticate('local-register', (err, u) => {

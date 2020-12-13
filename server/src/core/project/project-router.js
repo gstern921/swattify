@@ -1,4 +1,5 @@
 const { Router } = require('express');
+const { NO_CONTENT, OK } = require('http-status-codes');
 const { ensureAuth } = require('../../infrastructure/auth/auth-middleware');
 const Project = require('./ProjectModel');
 
@@ -26,6 +27,20 @@ router.post('/', ensureAuth, async (req, res) => {
     console.log(err);
     return res.status(500).json({ status: 'fail', err });
   }
+});
+
+router.delete('/:id', ensureAuth, async (req, res) => {
+  const userId = req.user.id;
+  const { id } = req.params;
+
+  const result = await Project.destroy({
+    where: {
+      id,
+      projectOwnerId: userId,
+    },
+  });
+
+  return res.status(OK).json({ result });
 });
 
 module.exports = router;

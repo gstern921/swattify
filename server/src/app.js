@@ -61,11 +61,12 @@ app.use((req, res, next) => {
 });
 
 app.use('/', require('./indexRouter'));
-app.use('/projects', require('./core/project/project-router'));
-app.use('/bug-reports', require('./core/bug-report/bugReport-router'));
+app.use('/api/v1/me', require('./core/me/me-router'));
+app.use('/api/v1/projects', require('./core/project/project-router'));
+app.use('/api/v1/bug-reports', require('./core/bug-report/bugReport-router'));
 
 // app.use('/', require('./routes/index'));
 // app.use('/users', require('./routes/users'));
-app.use('/auth', authRouter);
+app.use('/api/v1/auth', authRouter);
 
 module.exports = app;
