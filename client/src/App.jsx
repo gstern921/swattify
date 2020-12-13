@@ -1,4 +1,5 @@
 import "./App.css";
+
 import {
   BrowserRouter as Router,
   Redirect,
@@ -6,13 +7,14 @@ import {
   Link,
   Switch,
 } from "react-router-dom";
+
 import axios from "axios";
+
 import {
   API_LOGIN_ENDPOINT,
   API_LOGOUT_ENDPOINT,
   API_ME_ENDPOINT,
   API_REGISTER_ENDPOINT,
-  API_URL,
 } from "./config/app.config";
 
 import NavBar from "./components/navbar/NavBar";
