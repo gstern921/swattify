@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { OK, INTERNAL_SERVER_ERROR } = require('http-status-codes');
+const { OK, INTERNAL_SERVER_ERROR, NO_CONTENT, BAD_REQUEST } = require('http-status-codes');
 const { ensureAuth } = require('../../infrastructure/auth/auth-middleware');
 const BugReport = require('./BugReportModel');
 const { SUCCESS, ERROR } = require('../../config/app.config');
@@ -35,13 +35,21 @@ router.post('/', ensureAuth, async (req, res, next) => {
 router.delete('/:id', ensureAuth, async (req, res) => {
   const userId = req.user.id;
   const { id } = req.params;
-  const bugReport = await BugReport.destroy({
-    where: {
-      userId,
-      id,
-    },
-  });
-  return res.status(200).json({ bugReport });
+  try {
+    const deletedCount = await BugReport.destroy({
+      where: {
+        userId,
+        id,
+      },
+    });
+
+    if (deletedCount) {
+      return res.status(NO_CONTENT).json({ message: 'success', deleted: deletedCount });
+    }
+    return res.status(BAD_REQUEST).json({ message: 'Delete unsuccessful' });
+  } catch (err) {
+    return res.status(INTERNAL_SERVER_ERROR).json({ message: 'Unable to delete' });
+  }
 });
 
 module.exports = router;
