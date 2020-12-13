@@ -55,6 +55,7 @@ BugReport.belongsTo(User, {
   },
   onDelete: 'cascade',
 });
+
 BugReport.belongsTo(Project, {
   foreignKey: {
     field: 'bugReportProject',
@@ -62,9 +63,13 @@ BugReport.belongsTo(Project, {
   },
   onDelete: 'cascade',
 });
-BugReport.belongsToMany(User, { through: 'userBugReports', timestamps: false });
-User.belongsToMany(BugReport, { through: 'userBugReports', timestamps: false });
-BugReport.belongsToMany(Project, { through: 'projectBugReports', timestamps: false });
-Project.belongsToMany(BugReport, { through: 'projectBugReports', timestamps: false });
+User.hasMany(BugReport, { foreignKey: { field: 'bugReportCreator', allowNull: false }, onDelete: 'cascade' });
+Project.hasMany(BugReport, {
+  foreignKey: {
+    field: 'bugReportProject',
+    allowNull: false,
+  },
+  onDelete: 'cascade',
+});
 
 module.exports = BugReport;

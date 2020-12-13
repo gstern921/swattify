@@ -32,6 +32,16 @@ router.post('/', ensureAuth, async (req, res, next) => {
   }
 });
 
-router.delete('/:id', ensureAuth, async (req, res) => {});
+router.delete('/:id', ensureAuth, async (req, res) => {
+  const userId = req.user.id;
+  const { id } = req.params;
+  const bugReport = await BugReport.destroy({
+    where: {
+      userId,
+      id,
+    },
+  });
+  return res.status(200).json({ bugReport });
+});
 
 module.exports = router;
