@@ -6,8 +6,8 @@ const session = require('express-session');
 const passport = require('passport');
 const cookieParser = require('cookie-parser');
 const connectSequelize = require('connect-session-sequelize');
-const db = require('./infrastructure/db/db');
-const authRouter = require('./infrastructure/auth/auth-router');
+const db = require('./models').sequelize;
+const authRouter = require('./routers/authRouter');
 const configPassport = require('./config/passport');
 
 const { IS_PROD, CLIENT_URL, SESSION_COOKIE_NAME, SESSION_SECRET } = require('./config/app.config');
@@ -61,9 +61,9 @@ app.use((req, res, next) => {
 });
 
 app.use('/', require('./indexRouter'));
-app.use('/api/v1/me', require('./core/me/me-router'));
-app.use('/api/v1/projects', require('./core/project/project-router'));
-app.use('/api/v1/bug-reports', require('./core/bug-report/bugReport-router'));
+app.use('/api/v1/me', require('./routers/meRouter'));
+app.use('/api/v1/projects', require('./routers/projectRouter'));
+app.use('/api/v1/bug-reports', require('./routers/bugReportRouter'));
 
 // app.use('/', require('./routes/index'));
 // app.use('/users', require('./routes/users'));

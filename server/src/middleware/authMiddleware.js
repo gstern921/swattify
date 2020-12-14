@@ -1,5 +1,5 @@
 const { BAD_REQUEST } = require('http-status-codes');
-const { FAIL } = require('../../config/app.config');
+const { FAIL } = require('../config/app.config');
 
 module.exports = {
   ensureAuth: (req, res, next) => {

@@ -2,7 +2,7 @@ const {
   Model
 } = require('sequelize');
 
-const trimString = require('../utils/nullsafeTrimString');
+const { nullsafeTrimString: trimString } = require('../utils');
 
 module.exports = (sequelize, DataTypes) => {
   class BugReport extends Model {
@@ -13,14 +13,14 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      BugReport.belongsTo(models.User, {
+      BugReport.belongsTo(models.users, {
         foreignKey: {
           field: 'bugReportCreator',
           allowNull: false,
         },
         onDelete: 'cascade',
       });
-      BugReport.belongsTo(models.Project, {
+      BugReport.belongsTo(models.projects, {
         foreignKey: {
           field: 'bugReportProject',
           allowNull: false,

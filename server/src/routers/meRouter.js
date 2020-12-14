@@ -1,10 +1,8 @@
 const express = require('express');
 const { OK, INTERNAL_SERVER_ERROR } = require('http-status-codes');
-const { SUCCESS, ERROR } = require('../../config/app.config');
-const { ensureAuth } = require('../../infrastructure/auth/auth-middleware');
-const { catchAsync } = require('../../utils/catchAsync');
-const { getAllProjectsByUserId } = require('../project/projectController');
-const Project = require('../project/ProjectModel');
+const { SUCCESS, ERROR } = require('../config/app.config');
+const { ensureAuth } = require('../middleware/authMiddleware');
+const { getAllProjectsByUserId } = require('../controllers/projectController');
 
 const router = express.Router();
 

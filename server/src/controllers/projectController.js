@@ -1,5 +1,5 @@
 const { Project, User, ProjectUsers } = require('../models');
-const db = require('../../infrastructure/db/db');
+const db = require('../models').sequelize;
 
 exports.getAllProjectsByUserId = async (userId) => {
   const user = await User.findByPk(userId);
@@ -11,7 +11,9 @@ exports.getAllProjectsByUserId = async (userId) => {
   return projects;
 };
 
-exports.createProject = async ({ name, description, logoUrl, isPublic }, user) => {
+exports.createProject = async ({
+  name, description, logoUrl, isPublic,
+}, user) => {
   console.log(user.id)
   const newProject = await db.transaction(async (transaction) => {
     const project = await Project.create(

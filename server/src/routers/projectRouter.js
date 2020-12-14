@@ -1,9 +1,8 @@
 const { Router } = require('express');
-const { NO_CONTENT, OK, BAD_REQUEST } = require('http-status-codes');
-const {FAIL, SUCCESS} = require('../../config/app.config');
-const { ensureAuth } = require('../../infrastructure/auth/auth-middleware');
-const Project = require('./ProjectModel');
-const {createProject, deleteProjectById } = require('./projectController');
+const { OK, BAD_REQUEST } = require('http-status-codes');
+const {FAIL, SUCCESS} = require('../config/app.config');
+const { ensureAuth } = require('../middleware/authMiddleware');
+const { createProject, deleteProjectById } = require('../controllers/projectController');
 
 const router = Router();
 

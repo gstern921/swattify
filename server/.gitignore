@@ -63,3 +63,5 @@ typings/
 # Typescript output directory
 dist
 dump.rdb
+
+sequelize_config.json

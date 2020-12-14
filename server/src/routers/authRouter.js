@@ -1,9 +1,9 @@
 const express = require('express');
 const passport = require('passport');
 const { OK, BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND } = require('http-status-codes');
-const { CLIENT_URL, SUCCESS, FAIL, ERROR } = require('../../config/app.config');
-const { ensureGuest, ensureAuth } = require('./auth-middleware');
-const User = require('../../core/user/UserModel');
+const { CLIENT_URL, SUCCESS, FAIL, ERROR } = require('../config/app.config');
+const { ensureGuest, ensureAuth } = require('../middleware/authMiddleware');
+const User = require('../models/User');
 
 const router = express.Router();
 

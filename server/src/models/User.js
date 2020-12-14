@@ -2,9 +2,9 @@ const {
   Model
 } = require('sequelize');
 const bcryptjs = require('bcryptjs');
-const { BCRYPT_SALT_ROUNDS, MINIMUM_PASSWORD_LENGTH, MAXIMUM_PASSWORD_LENGTH } = require('../../config/app.config');
-const trimString = require('../utils/nullsafeTrimString');
-const toLower = require('../utils/nullsafeToLowerCase');
+const { BCRYPT_SALT_ROUNDS, MINIMUM_PASSWORD_LENGTH, MAXIMUM_PASSWORD_LENGTH } = require('../config/app.config');
+const { nullsafeTrimString: trimString } = require('../utils');
+const { nullsafeToLower: toLower } = require('../utils');
 
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
@@ -15,9 +15,9 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      User.hasMany(models.Project, { as: 'ownedProjects', foreignKey: 'projectOwnerId' });
-      User.belongsToMany(models.Project, { through: models.ProjectUsers, timestamps: false });
-      User.hasMany(models.BugReport, { foreignKey: { field: 'bugReportCreator', allowNull: false }, onDelete: 'cascade' });
+      User.hasMany(models.projects, { as: 'ownedProjects', foreignKey: 'projectOwnerId' });
+      User.belongsToMany(models.projects, { through: 'ProjectUsers', timestamps: false });
+      User.hasMany(models.bugReports, { foreignKey: { field: 'bugReportCreator', allowNull: false }, onDelete: 'cascade' });
     }
 
     static async verifyPasswordasync(password) {

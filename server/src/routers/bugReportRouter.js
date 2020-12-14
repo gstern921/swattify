@@ -1,8 +1,10 @@
 const { Router } = require('express');
-const { OK, INTERNAL_SERVER_ERROR, NO_CONTENT, BAD_REQUEST } = require('http-status-codes');
-const { ensureAuth } = require('../../infrastructure/auth/auth-middleware');
-const BugReport = require('./BugReportModel');
-const { SUCCESS, ERROR } = require('../../config/app.config');
+const {
+  OK, INTERNAL_SERVER_ERROR, NO_CONTENT, BAD_REQUEST
+} = require('http-status-codes');
+const { ensureAuth } = require('../middleware/authMiddleware');
+const BugReport = require('../models/BugReport');
+const { SUCCESS, ERROR } = require('../config/app.config');
 
 const router = Router();
 
@@ -12,8 +14,10 @@ const router = Router();
 // priority
 // status
 
-router.post('/', ensureAuth, async (req, res, next) => {
-  const { name, description, severity, priority, status, projectId } = req.body;
+router.post('/', ensureAuth, async (req, res) => {
+  const {
+    name, description, severity, priority, status, projectId
+  } = req.body;
   const userId = req.user.id;
   try {
     const bugReport = await BugReport.create({

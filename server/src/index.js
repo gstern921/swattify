@@ -12,17 +12,16 @@ const app = require('./app');
 const { PORT, IS_PROD } = require('./config/app.config');
 const { NODE_ENV } = require('./config/app.config');
 
-const requireEnvironmentVariables = require('./utils/requireEnvironmentVariables');
+const { requireEnvironmentVariables } = require('./utils');
 const { REQUIRED_ENVIRONMENT_VARIABLES } = require('./config/app.config');
 
 requireEnvironmentVariables(REQUIRED_ENVIRONMENT_VARIABLES);
-const models = require('./core/models');
 
-const db = require('./infrastructure/db/db');
+const db = require('./models').sequelize;
 
 db.authenticate().then(async () => {
   try {
-    await db.sync({ force: !IS_PROD });
+    // await db.sync({ force: !IS_PROD });
   } catch (e) {
     console.log(e);
   }
