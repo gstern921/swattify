@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const db = require('../../infrastructure/db/db');
 const User = require('../user/UserModel');
-const trimString = require('../../infrastructure/utils/nullsafeTrimString');
+const trimString = require('../../utils/nullsafeTrimString');
 
 const Project = db.define(
   'projects',
@@ -26,6 +26,13 @@ const Project = db.define(
       type: DataTypes.BOOLEAN,
       defaultValue: true,
     },
+    projectOwnerId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: User,
+      },
+      allowNull: false,
+    },
   },
   {
     freezeTableName: true,
@@ -39,10 +46,5 @@ Project.addHook('beforeValidate', (instance) => {
   project.password = trimString(project.password);
   // console.log('beforeValidate: ', instance)
 });
-
-User.hasMany(Project, { as: 'projectOwner' });
-Project.belongsTo(User, { as: 'projectOwner' });
-Project.belongsToMany(User, { through: 'projectUsers', timestamps: false });
-User.belongsToMany(Project, { through: 'projectUsers', timestamps: false });
 
 module.exports = Project;

@@ -6,12 +6,12 @@ const URL = IS_PROD ? DATABASE_URL : DEV_DATABASE_URL;
 const DB_OPTIONS = {
   dialect: 'postgres',
   protocol: 'postgres',
-  logging: false,
+  logging: IS_PROD ? false : console.log,
 };
 
 if (IS_PROD) {
   DB_OPTIONS.dialectOptions = { ssl: { require: true, rejectUnauthorized: false } };
 }
 
-const db = new Sequelize(URL, {});
+const db = new Sequelize(URL, DB_OPTIONS);
 module.exports = db;

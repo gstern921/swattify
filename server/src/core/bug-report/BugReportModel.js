@@ -2,7 +2,7 @@ const { DataTypes } = require('sequelize');
 const db = require('../../infrastructure/db/db');
 const User = require('../user/UserModel');
 const Project = require('../project/ProjectModel');
-const trimString = require('../../infrastructure/utils/nullsafeTrimString');
+const trimString = require('../../utils/nullsafeTrimString');
 
 const BugReport = db.define(
   'bugReports',
@@ -46,30 +46,6 @@ BugReport.addHook('beforeValidate', (instance) => {
   bugReport.name = trimString(bugReport.name);
   bugReport.description = trimString(bugReport.description);
   // console.log('beforeValidate: ', instance)
-});
-
-BugReport.belongsTo(User, {
-  foreignKey: {
-    field: 'bugReportCreator',
-    allowNull: false,
-  },
-  onDelete: 'cascade',
-});
-
-BugReport.belongsTo(Project, {
-  foreignKey: {
-    field: 'bugReportProject',
-    allowNull: false,
-  },
-  onDelete: 'cascade',
-});
-User.hasMany(BugReport, { foreignKey: { field: 'bugReportCreator', allowNull: false }, onDelete: 'cascade' });
-Project.hasMany(BugReport, {
-  foreignKey: {
-    field: 'bugReportProject',
-    allowNull: false,
-  },
-  onDelete: 'cascade',
 });
 
 module.exports = BugReport;

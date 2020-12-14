@@ -9,16 +9,16 @@ const ProjectUsers = db.define(
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      primaryKey: true,
       references: User,
       onDelete: 'cascade',
+      unique: 'unique-project-user-pair',
     },
     projectId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      primaryKey: true,
       references: Project,
       onDelete: 'cascade',
+      unique: 'unique-project-user-pair',
     },
   },
   {

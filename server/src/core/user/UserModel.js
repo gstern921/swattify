@@ -2,8 +2,8 @@ const { DataTypes } = require('sequelize');
 const bcryptjs = require('bcryptjs');
 const db = require('../../infrastructure/db/db');
 const { BCRYPT_SALT_ROUNDS, MINIMUM_PASSWORD_LENGTH, MAXIMUM_PASSWORD_LENGTH } = require('../../config/app.config');
-const trimString = require('../../infrastructure/utils/nullsafeTrimString');
-const toLower = require('../../infrastructure/utils/nullsafeToLowerCase');
+const trimString = require('../../utils/nullsafeTrimString');
+const toLower = require('../../utils/nullsafeToLowerCase');
 
 const User = db.define(
   'users',
@@ -48,13 +48,18 @@ const User = db.define(
     freezeTableName: true,
     defaultScope: {
       attributes: {
-        exclude: ['password'],
+        exclude: ['password', 'email', 'createdAt', 'updatedAt', 'deletedAt'],
       },
     },
     scopes: {
       withPassword: {
         attributes: {
           exclude: [],
+        },
+      },
+      self: {
+        attributes: {
+          exclude: ['password'],
         },
       },
     },

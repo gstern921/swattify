@@ -12,14 +12,11 @@ const app = require('./app');
 const { PORT, IS_PROD } = require('./config/app.config');
 const { NODE_ENV } = require('./config/app.config');
 
-const requireEnvironmentVariables = require('./infrastructure/utils/requireEnvironmentVariables');
+const requireEnvironmentVariables = require('./utils/requireEnvironmentVariables');
 const { REQUIRED_ENVIRONMENT_VARIABLES } = require('./config/app.config');
 
-const User = require('./core/user/UserModel');
-const Project = require('./core/project/ProjectModel');
-const BugReport = require('./core/bug-report/BugReportModel');
-
 requireEnvironmentVariables(REQUIRED_ENVIRONMENT_VARIABLES);
+const models = require('./core/models');
 
 const db = require('./infrastructure/db/db');
 
@@ -48,4 +45,5 @@ db.authenticate().then(async () => {
       server.close(() => console.log('💥 Process terminated!'));
     }
   });
-});
+}
+);

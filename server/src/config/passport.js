@@ -73,7 +73,7 @@ module.exports = (passport) => {
     let user = null;
 
     try {
-      user = await User.findByPk(id);
+      user = await User.scope('self').findByPk(id);
       // console.log('deserializeUser, user: ', user);
     } catch (error) {
       // console.log('deserializeUser, error: ', error);
