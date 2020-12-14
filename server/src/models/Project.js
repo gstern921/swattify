@@ -11,13 +11,20 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Project.belongsTo(models.users, { as: 'projectOwner' });
+      Project.belongsTo(models.User, { as: 'projectOwner' });
 
-      Project.belongsToMany(models.users, { through: 'ProjectUsers', timestamps: false });
-
-      Project.hasMany(models.bugReports, {
+      Project.belongsToMany(models.User, {
+        through: 'ProjectUsers',
+        timestamps: false,
         foreignKey: {
-          field: 'bugReportProject',
+          name: 'projectId',
+          allowNull: false,
+        },
+      });
+
+      Project.hasMany(models.BugReport, {
+        foreignKey: {
+          name: 'project',
           allowNull: false,
         },
         onDelete: 'cascade',
@@ -47,7 +54,8 @@ module.exports = (sequelize, DataTypes) => {
     },
   }, {
     sequelize,
-    modelName: 'projects',
+    modelName: 'Project',
+    tableName: 'projects',
     freezeTableName: true,
     hooks: {
       beforeValidate: (instance) => {

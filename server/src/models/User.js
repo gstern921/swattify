@@ -15,9 +15,16 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      User.hasMany(models.projects, { as: 'ownedProjects', foreignKey: 'projectOwnerId' });
-      User.belongsToMany(models.projects, { through: 'ProjectUsers', timestamps: false });
-      User.hasMany(models.bugReports, { foreignKey: { field: 'bugReportCreator', allowNull: false }, onDelete: 'cascade' });
+      User.hasMany(models.Project, { as: 'ownedProjects', foreignKey: { name: 'projectOwner', allowNull: false } });
+      User.belongsToMany(models.Project, {
+        through: 'ProjectUsers',
+        timestamps: false,
+        foreignKey: {
+          name: 'userId',
+          allowNull: false,
+        },
+      });
+      User.hasMany(models.BugReport, { foreignKey: { name: 'creator', allowNull: false }, onDelete: 'cascade' });
     }
 
     static async verifyPasswordasync(password) {
@@ -66,7 +73,8 @@ module.exports = (sequelize, DataTypes) => {
     },
   }, {
     sequelize,
-    modelName: 'users',
+    modelName: 'User',
+    tableName: 'users',
     paranoid: true,
     freezeTableName: true,
     defaultScope: {

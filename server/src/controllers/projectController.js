@@ -1,4 +1,4 @@
-const { Project, User, ProjectUsers } = require('../models');
+const { Project, User } = require('../models');
 const db = require('../models').sequelize;
 
 exports.getAllProjectsByUserId = async (userId) => {
@@ -11,10 +11,19 @@ exports.getAllProjectsByUserId = async (userId) => {
   return projects;
 };
 
+exports.getProjectById = async (projectId) => {
+  const user = await User.findByPk(1);
+  console.log(user);
+  // User.findAll({include: {attributes: {},through: {}})
+  const projects = await user.getProjects({
+    include: [{ model: User, through: { attributes: [] } }],
+  });
+  return projects;
+};
+
 exports.createProject = async ({
   name, description, logoUrl, isPublic,
 }, user) => {
-  console.log(user.id)
   const newProject = await db.transaction(async (transaction) => {
     const project = await Project.create(
       {
@@ -22,12 +31,12 @@ exports.createProject = async ({
         description,
         logoUrl,
         isPublic,
-        projectOwnerId: user.id,
+        projectOwner: user.id,
       },
       { transaction },
     );
-
-    await ProjectUsers.create({ userId: user.id, projectId: project.id }, { transaction });
+      console.log(project.addUser)
+    await project.addUser( user.id, { transaction });
 
     return project;
   });

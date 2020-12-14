@@ -1,6 +1,4 @@
-const {
-  Model
-} = require('sequelize');
+const { Model } = require('sequelize');
 
 const { nullsafeTrimString: trimString } = require('../utils');
 
@@ -13,29 +11,31 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      BugReport.belongsTo(models.users, {
+      BugReport.belongsTo(models.User, {
         foreignKey: {
-          field: 'bugReportCreator',
+          name: 'creator',
           allowNull: false,
         },
         onDelete: 'cascade',
       });
-      BugReport.belongsTo(models.projects, {
+      BugReport.belongsTo(models.Project, {
         foreignKey: {
-          field: 'bugReportProject',
+          name: 'project',
           allowNull: false,
         },
         onDelete: 'cascade',
       });
     }
   }
-  BugReport.init({
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notEmpty: { msg: 'bug report name cannot be empty' },
-        len: [1, 150],
+  BugReport.init(
+    {
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notEmpty: { msg: 'bug report name cannot be empty' },
+          len: [1, 150],
+        },
       },
       description: {
         type: DataTypes.TEXT,
@@ -58,18 +58,20 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: 'open',
       },
     },
-  }, {
-    sequelize,
-    modelName: 'bugReports',
-    freezeTableName: true,
-    hooks: {
-      beforeValidate: (instance) => {
-        const bugReport = instance;
-        bugReport.name = trimString(bugReport.name);
-        bugReport.description = trimString(bugReport.description);
-        // console.log('beforeValidate: ', instance)
+    {
+      sequelize,
+      modelName: 'BugReport',
+      tableName: 'bugReports',
+      freezeTableName: true,
+      hooks: {
+        beforeValidate: (instance) => {
+          const bugReport = instance;
+          bugReport.name = trimString(bugReport.name);
+          bugReport.description = trimString(bugReport.description);
+          // console.log('beforeValidate: ', instance)
+        },
       },
     },
-  });
+  );
   return BugReport;
 };

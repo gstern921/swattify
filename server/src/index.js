@@ -17,15 +17,15 @@ const { REQUIRED_ENVIRONMENT_VARIABLES } = require('./config/app.config');
 
 requireEnvironmentVariables(REQUIRED_ENVIRONMENT_VARIABLES);
 
-const db = require('./models').sequelize;
-
+const { sequelize: db, User, Project, BugReport, ProjectUsers } = require('./models');
 db.authenticate().then(async () => {
-  try {
-    // await db.sync({ force: !IS_PROD });
-  } catch (e) {
-    console.log(e);
+  if (!IS_PROD) {
+    await Project.sync({ force: true });
+    await BugReport.sync({ force: true });
+    await ProjectUsers.sync({ force: true });
+    // await User.sync({ force: true });
+    // await db.sync({ force: true });
   }
-
   console.log('Connected to database...');
   const server = app.listen(PORT, () => {
     console.log(`Running in ${NODE_ENV} mode on port ${PORT}`);

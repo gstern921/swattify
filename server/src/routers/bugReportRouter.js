@@ -1,10 +1,9 @@
 const { Router } = require('express');
-const {
-  OK, INTERNAL_SERVER_ERROR, NO_CONTENT, BAD_REQUEST
-} = require('http-status-codes');
+const { OK, INTERNAL_SERVER_ERROR, NO_CONTENT, BAD_REQUEST } = require('http-status-codes');
 const { ensureAuth } = require('../middleware/authMiddleware');
-const BugReport = require('../models/BugReport');
-const { SUCCESS, ERROR } = require('../config/app.config');
+const { createBugReport, deleteBugReportById } = require('../controllers/bugReportController');
+const { SUCCESS, ERROR, FAIL } = require('../config/app.config');
+const { catchAsync } = require('../utils/index');
 
 const router = Router();
 
@@ -14,46 +13,48 @@ const router = Router();
 // priority
 // status
 
-router.post('/', ensureAuth, async (req, res) => {
-  const {
-    name, description, severity, priority, status, projectId
-  } = req.body;
-  const userId = req.user.id;
-  try {
-    const bugReport = await BugReport.create({
-      name,
-      description,
-      severity,
-      priority,
-      status,
-      userId,
-      projectId,
-    });
-    return res.status(OK).json({ status: SUCCESS, bugReport });
-  } catch (e) {
-    console.log(e);
-    return res.status(INTERNAL_SERVER_ERROR).json({ status: ERROR, message: 'Unable to create bug report', e });
-  }
-});
+router.post(
+  '/',
+  ensureAuth,
+  async (req, res) => {
+    const { name, description, severity, priority, status, projectId } = req.body;
+    const { user } = req;
 
-router.delete('/:id', ensureAuth, async (req, res) => {
-  const userId = req.user.id;
-  const { id } = req.params;
-  try {
-    const deletedCount = await BugReport.destroy({
-      where: {
-        userId,
-        id,
-      },
-    });
+    try {
+      const bugReport = await createBugReport({
+        user,
+        name,
+        description,
+        severity,
+        priority,
+        status,
+        projectId,
+      });
+
+      if (bugReport) {
+        return res.status(OK).json({ status: SUCCESS, bugReport });
+      }
+
+      return res.status(BAD_REQUEST).json({ status: FAIL, message: 'Unable to create bug report for this project' });
+    } catch (e) {
+      console.log(e);
+      return res.status(INTERNAL_SERVER_ERROR).json({ status: ERROR, message: 'Unable to create bug report', e });
+    }
+  },
+);
+
+router.delete(
+  '/:id',
+  ensureAuth,
+  catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const deletedCount = await deleteBugReportById(req.user, id);
 
     if (deletedCount) {
-      return res.status(NO_CONTENT).json({ message: 'success', deleted: deletedCount });
+      return res.status(OK).json({ message: 'success', deleted: deletedCount });
     }
     return res.status(BAD_REQUEST).json({ message: 'Delete unsuccessful' });
-  } catch (err) {
-    return res.status(INTERNAL_SERVER_ERROR).json({ message: 'Unable to delete' });
-  }
-});
+  }),
+);
 
 module.exports = router;
