@@ -1,25 +1,23 @@
+const {
+  OK,
+  INTERNAL_SERVER_ERROR,
+  BAD_REQUEST,
+  NOT_FOUND
+} = require('http-status-codes');
 const { BugReport, sequelize, ProjectUsers } = require('../models');
-const { OK, INTERNAL_SERVER_ERROR, NO_CONTENT, BAD_REQUEST, NOT_FOUND } = require('http-status-codes');
 const { SUCCESS, ERROR, FAIL } = require('../config/app.config');
 const { catchAsync } = require('../utils');
 
-// exports.createBugReport = async ({
-//   user, name, description, severity, priority, status, projectId,
-// }, BugReportModel = BugReport) => {
-//   const bugReport = await BugReportModel.create({
-//     creator: user.id,
-//     name,
-//     description,
-//     severity,
-//     priority,
-//     status,
-//     project: projectId,
-//   });
-//   return bugReport;
-// };
-
 exports.createBugReport = catchAsync(async (req, res) => {
-  const { projectId, name, description, severity, priority, status } = req.body;
+  const {
+    projectId,
+    name,
+    description,
+    severity,
+    priority,
+    status
+  } = req.body;
+
   const { user } = req;
   const db = sequelize;
   try {
@@ -33,7 +31,7 @@ exports.createBugReport = catchAsync(async (req, res) => {
         },
         { transaction },
       );
-      console.log(projectUser);
+      // console.log(projectUser);
 
       if (projectUser) {
         const bugReport = await BugReport.create(
@@ -66,27 +64,81 @@ exports.createBugReport = catchAsync(async (req, res) => {
   }
 });
 
-exports.deleteBugReportById = ({ idParamName }) =>
-  catchAsync(async (req, res) => {
-    const { [idParamName]: id } = req.params;
-    const deletedCount = await BugReport.destroy({
-      where: {
-        id,
-        creator: req.user.id,
-      },
-    });
-
-    if (deletedCount) {
-      return res
-        .status(OK)
-        .json({ status: SUCCESS, message: 'Bug report successfully deleted', data: { deletedCount } });
-    }
-    return res.status(BAD_REQUEST).json({ status: FAIL, message: 'Delete unsuccessful' });
+exports.deleteBugReportById = ({ idParamName }) => catchAsync(async (req, res) => {
+  const { [idParamName]: id } = req.params;
+  const deletedCount = await BugReport.destroy({
+    where: {
+      id,
+      creator: req.user.id,
+    },
   });
 
-exports.getBugReportById = async (id) => {
-  const bugReport = await BugReport.findByPk(id);
-  return bugReport;
-};
+  if (deletedCount) {
+    return res
+      .status(OK)
+      .json({ status: SUCCESS, message: 'Bug report successfully deleted', data: { count: deletedCount } });
+  }
+  return res.status(BAD_REQUEST).json({ status: FAIL, message: 'Delete unsuccessful' });
+});
 
-exports.updateBugReportById = async (id, user) => {};
+exports.getBugReportById = ({ idParamName }) => catchAsync(async (req, res) => {
+  const { [idParamName]: id } = req.params;
+  try {
+    const bugReport = await BugReport.findByPk(id);
+    if (bugReport) {
+      return res.status(OK).json({ status: SUCCESS, data: { bugReport } });
+    }
+    return res.status(NOT_FOUND).json({ status: FAIL, message: 'Unable to find that bug report', data: null });
+  } catch (err) {
+    return res
+      .status(INTERNAL_SERVER_ERROR)
+      .json({ status: ERROR, message: 'An error occured while searching for that bug report', data: null });
+  }
+});
+
+exports.updateBugReportById = ({ idParamName }) => catchAsync(async (req, res) => {
+  const { [idParamName]: id } = req.params;
+  const creator = req.user.id;
+  const {
+    projectId,
+    name,
+    description,
+    severity,
+    priority,
+    status
+  } = req.body;
+
+  try {
+    const updated = await BugReport.update({
+      projectId,
+      name,
+      description,
+      severity,
+      priority,
+      status,
+    }, {
+      where: {
+        id,
+        creator,
+      },
+      returning: true,
+
+    });
+    const numUpdated = updated[0];
+    if (numUpdated) {
+      const updatedBugReport = updated[1];
+      return res.status(OK).json({
+        status: SUCCESS,
+        message: 'Bug report successfully updated',
+        data: { count: numUpdated, bugReport: updatedBugReport }
+      });
+    }
+    return res.status(NOT_FOUND).json({ status: FAIL, message: 'Bug report not found', data: null });
+  } catch (err) {
+    return res.status(INTERNAL_SERVER_ERROR).json({
+      status: ERROR,
+      message: 'Unable to update bug report',
+      data: null,
+    });
+  }
+});
