@@ -1,33 +1,25 @@
 const { Router } = require('express');
-const { OK, INTERNAL_SERVER_ERROR, NO_CONTENT, BAD_REQUEST, NOT_FOUND } = require('http-status-codes');
 const { ensureAuth } = require('../middleware/authMiddleware');
-const { createBugReport, deleteBugReportById, getBugReportById, updateBugReportById } = require('../controllers/bugReportController');
-const { SUCCESS, ERROR, FAIL } = require('../config/app.config');
-const { catchAsync } = require('../utils/index');
+const {
+  createBugReport,
+  deleteBugReportById,
+  getBugReportById,
+  updateBugReportById
+} = require('../controllers/bugReportController');
 
 const router = Router();
 
-const idParamName = 'bugReportId';
+router.use(ensureAuth);
 
 // Get Bug Report By ID
-router.get(
-  `/:${idParamName}`,
-  ensureAuth,
-  getBugReportById({ idParamName }),
-);
+router.get('/:bugReportId', (req, res) => getBugReportById(req.params.bugReportId)(req, res));
 
 // Create Bug Report
-router.post('/', ensureAuth, createBugReport);
+router.post('/', createBugReport);
 
 // Delete Bug Report By ID
-router.delete(`/:${idParamName}`,
-  ensureAuth,
-  deleteBugReportById({ idParamName }));
+router.delete('/:bugReportId', (req, res) => deleteBugReportById(req.params.bugReportId)(req, res));
 
-router.patch(
-  `/:${idParamName}`,
-  ensureAuth,
-  updateBugReportById({ idParamName }),
-);
+router.patch('/:bugReportId', (req, res) => updateBugReportById(req.params.bugReportId)(req, res));
 
 module.exports = router;

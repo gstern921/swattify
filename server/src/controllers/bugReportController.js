@@ -31,7 +31,7 @@ exports.createBugReport = catchAsync(async (req, res) => {
         },
         { transaction },
       );
-      // console.log(projectUser);
+      console.log(projectUser);
 
       if (projectUser) {
         const bugReport = await BugReport.create(
@@ -64,8 +64,7 @@ exports.createBugReport = catchAsync(async (req, res) => {
   }
 });
 
-exports.deleteBugReportById = ({ idParamName }) => catchAsync(async (req, res) => {
-  const { [idParamName]: id } = req.params;
+exports.deleteBugReportById = (id) => catchAsync(async (req, res) => {
   const deletedCount = await BugReport.destroy({
     where: {
       id,
@@ -81,8 +80,7 @@ exports.deleteBugReportById = ({ idParamName }) => catchAsync(async (req, res) =
   return res.status(BAD_REQUEST).json({ status: FAIL, message: 'Delete unsuccessful' });
 });
 
-exports.getBugReportById = ({ idParamName }) => catchAsync(async (req, res) => {
-  const { [idParamName]: id } = req.params;
+exports.getBugReportById = (id) => catchAsync(async (req, res) => {
   try {
     const bugReport = await BugReport.findByPk(id);
     if (bugReport) {
@@ -96,8 +94,7 @@ exports.getBugReportById = ({ idParamName }) => catchAsync(async (req, res) => {
   }
 });
 
-exports.updateBugReportById = ({ idParamName }) => catchAsync(async (req, res) => {
-  const { [idParamName]: id } = req.params;
+exports.updateBugReportById = (id) => catchAsync(async (req, res) => {
   const creator = req.user.id;
   const {
     projectId,

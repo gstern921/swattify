@@ -1,58 +1,93 @@
+const { INTERNAL_SERVER_ERROR, OK, BAD_REQUEST } = require('http-status-codes');
+const { SUCCESS, ERROR, FAIL } = require('../config/app.config');
 const { Project, User } = require('../models');
+const { catchAsync } = require('../utils/index');
 const db = require('../models').sequelize;
 
-exports.getAllProjectsByUserId = async (userId) => {
-  const user = await User.findByPk(userId);
-  console.log(user);
-  // User.findAll({include: {attributes: {},through: {}})
-  const projects = await user.getProjects({
-    include: [{ model: User, through: { attributes: [] } }],
-  });
-  return projects;
+exports.getAllProjectsByUserId = (userId) => async (req, res) => {
+  try {
+    const user = await User.findByPk(userId);
+    console.log(user);
+    const projects = await user.getProjects({
+      include: [{ model: User, through: { attributes: [] } }],
+    });
+    const count = projects.length;
+    return res.status(OK).json({ status: SUCCESS, count, message: 'Successfully found projects', data: { projects } });
+  } catch (err) {
+    return res.status(ERROR).json({ status: ERROR, message: 'Unable to find projects', data: null });
+  }
 };
 
-exports.getProjectById = async (projectId) => {
-  const user = await User.findByPk(1);
-  console.log(user);
-  // User.findAll({include: {attributes: {},through: {}})
-  const projects = await user.getProjects({
-    include: [{ model: User, through: { attributes: [] } }],
-  });
-  return projects;
-};
+exports.getProjectById = (projectId) =>
+  catchAsync(async (req, res) => {
+    const { user } = req;
+    const id = projectId;
 
-exports.createProject = async ({
-  name, description, logoUrl, isPublic,
-}, user) => {
-  const newProject = await db.transaction(async (transaction) => {
-    const project = await Project.create(
-      {
-        name,
-        description,
-        logoUrl,
-        isPublic,
-        projectOwner: user.id,
+    // User.findAll({include: {attributes: {},through: {}})
+    const projects = await user.getProjects({
+      where: {
+        id,
       },
-      { transaction },
-    );
-      console.log(project.addUser)
-    await project.addUser( user.id, { transaction });
-
-    return project;
+      include: [{ model: User, through: { attributes: [] } }],
+    });
+    return projects;
   });
 
-  return newProject;
+exports.createProject = catchAsync(async (req, res) => {
+  const { name, description, logoUrl, isPublic } = req.body;
 
-  // If the execution reaches this line, the transaction has been committed successfully
-  // `result` is whatever was returned from the transaction callback (the `user`, in this case)
-};
+  const { user } = req;
+  try {
+    const newProject = await db.transaction(async (transaction) => {
+      const project = await user.createProject(
+        {
+          name,
+          description,
+          logoUrl,
+          isPublic,
+          projectOwnerId: user.id,
+        },
+        { transaction },
+      );
 
-exports.deleteProjectById = async ({ id, userId }) => {
-  const result = await Project.destroy({
-    where: {
-      id,
-      projectOwnerId: userId,
-    },
-  });
-  return result;
+      return project;
+    });
+
+    if (newProject) {
+      return res
+        .status(OK)
+        .json({ status: SUCCESS, message: 'Project created successfully', data: { project: newProject } });
+    }
+
+    return res.status(BAD_REQUEST).json({ status: FAIL, message: 'Cannot create new project', data: null });
+  } catch (err) {
+    return res.status(INTERNAL_SERVER_ERROR).json({ status: ERROR, message: 'Unable to create project', data: null });
+  }
+});
+
+exports.deleteProjectById = (projectId) => async (req, res) => {
+  const userId = req.user.id;
+
+  try {
+    const result = await Project.destroy({
+      where: {
+        id: projectId,
+        projectOwnerId: userId,
+      },
+    });
+    console.log(result);
+    if (!result) {
+      return res.status(BAD_REQUEST).json({
+        status: FAIL,
+        message: 'Unable to delete project',
+      });
+    }
+    return res.status(OK).json({ status: SUCCESS, message: 'Project successfully deleted', data: { count: result } });
+  } catch (err) {
+    return res.status(INTERNAL_SERVER_ERROR).json({
+      status: ERROR,
+      message: 'Unable to delete project, something went wrong',
+      data: null,
+    });
+  }
 };

@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Project.belongsTo(models.User, { as: 'projectOwner' });
+      Project.belongsTo(models.User, { as: 'projectOwner', foreignKey: { name: 'projectOwnerId' } });
 
       Project.belongsToMany(models.User, {
         through: 'ProjectUsers',
@@ -67,5 +67,7 @@ module.exports = (sequelize, DataTypes) => {
       },
     },
   });
+
+  // Project.create({},{include: {model: User, as: 'projectOwner', }})
   return Project;
 };
