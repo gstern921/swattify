@@ -17,12 +17,13 @@ const { REQUIRED_ENVIRONMENT_VARIABLES } = require('./config/app.config');
 
 requireEnvironmentVariables(REQUIRED_ENVIRONMENT_VARIABLES);
 
-const { sequelize: db, User, Project, BugReport, ProjectUsers } = require('./models');
+const { sequelize: db, User, Project, BugReport, ProjectUsers, BugReportComment } = require('./models');
 db.authenticate().then(async () => {
   if (!IS_PROD) {
     await Project.sync({ force: true });
     await BugReport.sync({ force: true });
     await ProjectUsers.sync({ force: true });
+    await BugReportComment.sync({ force: true });
     // await User.sync({ force: true });
     // await db.sync({ force: true });
   }

@@ -7,7 +7,7 @@ const db = require('../models').sequelize;
 exports.getAllProjectsByUserId = (userId) => async (req, res) => {
   try {
     const user = await User.findByPk(userId);
-    console.log(user);
+    // console.log(user);
     const projects = await user.getProjects({
       include: [{ model: User, through: { attributes: [] } }],
     });
