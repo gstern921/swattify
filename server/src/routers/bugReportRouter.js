@@ -6,6 +6,7 @@ const {
   getBugReportById,
   updateBugReportById
 } = require('../controllers/bugReportController');
+const { createCommentForBugReportId } = require('../controllers/bugReportCommentController');
 
 const router = Router();
 
@@ -21,5 +22,8 @@ router.post('/', createBugReport);
 router.delete('/:bugReportId', (req, res) => deleteBugReportById(req.params.bugReportId)(req, res));
 
 router.patch('/:bugReportId', (req, res) => updateBugReportById(req.params.bugReportId)(req, res));
+
+router.post('/:bugReportId/comment', (req, res, next) => createCommentForBugReportId(req.params.bugReportId)(req, res, next));
+
 
 module.exports = router;
