@@ -27,7 +27,7 @@ module.exports = (sequelize, DataTypes) => {
       User.hasMany(models.BugReport, { foreignKey: { name: 'creator', allowNull: false }, onDelete: 'cascade' });
     }
 
-    static async verifyPasswordasync(password) {
+    async verifyPassword(password) {
       // console.log(this);
       if (!password) {
         return false;

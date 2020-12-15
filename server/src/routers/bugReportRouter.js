@@ -1,59 +1,48 @@
 const { Router } = require('express');
-const { OK, INTERNAL_SERVER_ERROR, NO_CONTENT, BAD_REQUEST } = require('http-status-codes');
+const { OK, INTERNAL_SERVER_ERROR, NO_CONTENT, BAD_REQUEST, NOT_FOUND } = require('http-status-codes');
 const { ensureAuth } = require('../middleware/authMiddleware');
-const { createBugReport, deleteBugReportById } = require('../controllers/bugReportController');
+const { createBugReport, deleteBugReportById, getBugReportById } = require('../controllers/bugReportController');
 const { SUCCESS, ERROR, FAIL } = require('../config/app.config');
 const { catchAsync } = require('../utils/index');
 
 const router = Router();
 
-// name
-// description
-// severity
-// priority
-// status
-
-router.post(
-  '/',
+// Get Bug Report By ID
+router.get(
+  '/:bugReportId',
   ensureAuth,
-  async (req, res) => {
-    const { name, description, severity, priority, status, projectId } = req.body;
-    const { user } = req;
-
+  catchAsync(async (req, res) => {
+    const { bugReportId: id } = req.params;
     try {
-      const bugReport = await createBugReport({
-        user,
-        name,
-        description,
-        severity,
-        priority,
-        status,
-        projectId,
-      });
-
+      const bugReport = await getBugReportById(id);
       if (bugReport) {
-        return res.status(OK).json({ status: SUCCESS, bugReport });
+        return res.status(OK).json({ status: SUCCESS, data: bugReport });
       }
-
-      return res.status(BAD_REQUEST).json({ status: FAIL, message: 'Unable to create bug report for this project' });
-    } catch (e) {
-      console.log(e);
-      return res.status(INTERNAL_SERVER_ERROR).json({ status: ERROR, message: 'Unable to create bug report', e });
+      return res.status(NOT_FOUND).json({ status: FAIL, message: 'Unable to find that bug report', data: null });
+    } catch (err) {
+      return res
+        .status(INTERNAL_SERVER_ERROR)
+        .json({ status: ERROR, message: 'An error occured while searching for that bug report', data: null });
     }
-  },
+  }),
 );
 
-router.delete(
+// Create Bug Report
+router.post('/', ensureAuth, createBugReport);
+
+// Delete Bug Report By ID
+router.delete('/:bugReportId',
+  ensureAuth,
+  deleteBugReportById({
+    idParamName: 'bugReportId',
+  }));
+
+router.patch(
   '/:id',
   ensureAuth,
   catchAsync(async (req, res) => {
-    const { id } = req.params;
-    const deletedCount = await deleteBugReportById(req.user, id);
-
-    if (deletedCount) {
-      return res.status(OK).json({ message: 'success', deleted: deletedCount });
-    }
-    return res.status(BAD_REQUEST).json({ message: 'Delete unsuccessful' });
+    console.log();
+    return null;
   }),
 );
 
