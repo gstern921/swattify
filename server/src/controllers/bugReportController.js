@@ -8,15 +8,18 @@ const { BugReport, sequelize, ProjectUsers } = require('../models');
 const { SUCCESS, ERROR, FAIL } = require('../config/app.config');
 const { catchAsync } = require('../utils');
 
-exports.createBugReport = catchAsync(async (req, res) => {
+exports.createBugReport = (projectId) => catchAsync(async (req, res) => {
   const {
-    projectId,
     name,
     description,
     severity,
     priority,
     status
   } = req.body;
+
+  if (!projectId) {
+    return res.status(BAD_REQUEST).json({ status: FAIL, message: 'Cannot create bug report without project ID', data: null });
+  }
 
   const { user } = req;
   const db = sequelize;

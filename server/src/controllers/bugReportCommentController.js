@@ -43,7 +43,8 @@ exports.createCommentForBugReportId = (bugReportId) =>
         );
         return bugReportComment;
       });
-      res.status(OK).json({ status: SUCCESS, message: 'Comment created successfully', data: { comment: newComment} });
+
+      res.status(OK).json({ status: SUCCESS, message: 'Comment created successfully', data: { comment: newComment } });
     } catch (err) {
       return res
         .status(INTERNAL_SERVER_ERROR)
@@ -51,7 +52,10 @@ exports.createCommentForBugReportId = (bugReportId) =>
     }
   });
 
-exports.deleteBugReportCommentById = (id) => catchAsync(async (req, res) => {});
+exports.deleteBugReportCommentById = (id) => catchAsync(async (req, res) => {
+
+
+});
 
 exports.getBugReportCommentById = (id) => catchAsync(async (req, res) => {});
 

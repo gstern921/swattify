@@ -16,7 +16,7 @@ router.use(ensureAuth);
 router.get('/:bugReportId', (req, res) => getBugReportById(req.params.bugReportId)(req, res));
 
 // Create Bug Report
-router.post('/', createBugReport);
+router.post('/:projectId', (req, res) => createBugReport(req.params.projectId)(req, res));
 
 // Delete Bug Report By ID
 router.delete('/:bugReportId', (req, res) => deleteBugReportById(req.params.bugReportId)(req, res));

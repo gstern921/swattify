@@ -7,7 +7,6 @@ const passport = require('passport');
 const cookieParser = require('cookie-parser');
 const connectSequelize = require('connect-session-sequelize');
 const db = require('./models').sequelize;
-const authRouter = require('./routers/authRouter');
 const configPassport = require('./config/passport');
 
 const { IS_PROD, CLIENT_URL, SESSION_COOKIE_NAME, SESSION_SECRET } = require('./config/app.config');
@@ -67,6 +66,6 @@ app.use('/api/v1/bug-reports', require('./routers/bugReportRouter'));
 
 // app.use('/', require('./routes/index'));
 // app.use('/users', require('./routes/users'));
-app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/auth', require('./routers/authRouter'));
 
 module.exports = app;
