@@ -10,13 +10,16 @@ const {
 
 const { createCommentForBugReportId, getBugReportCommentsByReportId } = require('../controllers/bugReportCommentController');
 
-const { paginate } = require('../middleware/queryMiddleware');
+const { paginate, sort } = require('../middleware/queryMiddleware');
 
 const router = Router();
 
 router.use(ensureAuth);
 
-router.get('/', paginate({ maximumPageSize: 20, defaultPageSize: 20 }), getAllBugReports);
+router.get('/',
+  paginate({ maximumPageSize: 20, defaultPageSize: 20 }),
+  sort(['createdAt', 'updatedAt', 'name', 'description', 'severity', 'priority', 'status']),
+  getAllBugReports);
 
 // Create Bug Report
 router.post('/', (req, res) => createBugReport(req.body.projectId)(req, res));
@@ -29,7 +32,9 @@ router.delete('/:bugReportId', (req, res) => deleteBugReportById(req.params.bugR
 
 router.patch('/:bugReportId', (req, res) => updateBugReportById(req.params.bugReportId)(req, res));
 
-router.get('/:bugReportId/comments', paginate({ maximumPageSize: 20, defaultPageSize: 20 }), (req, res) => getBugReportCommentsByReportId(req.params.bugReportId)(req, res));
+router.get('/:bugReportId/comments',
+  paginate({ maximumPageSize: 20, defaultPageSize: 20 }),
+  (req, res) => getBugReportCommentsByReportId(req.params.bugReportId)(req, res));
 
 router.post('/:bugReportId/comments', (req, res) => createCommentForBugReportId(req.params.bugReportId)(req, res));
 

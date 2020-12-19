@@ -5,16 +5,24 @@ const { catchAsync } = require('../utils');
 const { OK, INTERNAL_SERVER_ERROR, BAD_REQUEST, NOT_FOUND, UNAUTHORIZED } = StatusCodes;
 
 exports.getBugReportCommentsByReportId = (bugReportId) => catchAsync(async (req, res) => {
-  const comments = await BugReportComment.findAll({
-    where: {
-      bugReportId,
-    },
-    limit: req.paginateLimit,
-    offset: req.paginateOffset,
-  });
-
-  return res.status(OK).json({ status: SUCCESS, data: comments });
-
+  try {
+    const { totalCount, rows } = await BugReportComment.findAndCountAll({
+      where: {
+        bugReportId,
+      },
+      limit: req.paginateLimit,
+      offset: req.paginateOffset,
+    });
+    const count = rows.length;
+    return res.status(OK).json({
+      status: SUCCESS,
+      count,
+      data: rows,
+      totalCount,
+    });
+  } catch (err) {
+    return res.status(INTERNAL_SERVER_ERROR).json({ status: ERROR, message: 'Something went wrong'});
+  }
 });
 
 exports.createCommentForBugReportId = (bugReportId) =>

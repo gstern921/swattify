@@ -47,15 +47,15 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
       severity: {
-        type: DataTypes.ENUM('critical', 'major', 'minor', 'low'),
+        type: DataTypes.ENUM('low', 'minor', 'major', 'critical'),
         allowNull: false,
       },
       priority: {
-        type: DataTypes.ENUM('immediate', 'high', 'medium', 'low'),
+        type: DataTypes.ENUM('low', 'medium', 'high', 'immediate'),
         allowNull: false,
       },
       status: {
-        type: DataTypes.ENUM('open', 'resolved', 'declined', 'invalid', 'duplicate'),
+        type: DataTypes.ENUM('open', 'resolved', 'declined', 'duplicate', 'invalid'),
         allowNull: false,
         defaultValue: 'open',
       },
