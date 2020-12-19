@@ -63,8 +63,8 @@ module.exports = (sequelize, DataTypes) => {
       validate: {
         notEmpty: true,
         len: {
-          args: [MINIMUM_PASSWORD_LENGTH, MAXIMUM_PASSWORD_LENGTH],
-          msg: `Password should be between ${MINIMUM_PASSWORD_LENGTH} and ${MAXIMUM_PASSWORD_LENGTH} characters long`,
+          args: [MINIMUM_PASSWORD_LENGTH],
+          msg: `Password should be at least ${MINIMUM_PASSWORD_LENGTH} characters long`,
         },
       },
     },

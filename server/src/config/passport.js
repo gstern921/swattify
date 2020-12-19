@@ -9,13 +9,13 @@ module.exports = (passport) => {
         const user = await User.scope('withPassword').findOne({ where: { email } });
 
         if (!user) {
-          return done(null, false);
+          return done(new Error('Invalid email or password'), false);
         }
 
         const passwordsMatch = await user.verifyPassword(password);
 
         if (!passwordsMatch) {
-          return done(null, false);
+          return done(new Error('Invalid email or password'), false);
         }
         // Successful Log In
         user.password = undefined;
