@@ -8,6 +8,10 @@ import {
   Switch,
 } from "react-router-dom";
 
+import { connect } from "react-redux";
+
+import HomePage from "./pages/home-page/HomePage";
+
 import axios from "axios";
 
 import {
@@ -21,46 +25,35 @@ import NavBar from "./components/navbar/NavBar";
 
 import React, { Component } from "react";
 import LoginRegisterForm from "./containers/login-register-form/LoginRegisterForm";
+import {checkLoggedInStatus} from "./entities/user/user.actions";
 
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      user: null,
-    };
   }
 
-  checkLogInStatus() {
-    return axios({
-      method: "GET",
-      url: API_ME_ENDPOINT,
-      headers: { "Content-Type": "application/json" },
-      withCredentials: true,
-    });
-  }
-
-  loginWithCredentials = ({ email, password }) => (e) => {
-    e.preventDefault();
-    return axios({
-      method: "POST",
-      url: API_LOGIN_ENDPOINT,
-      headers: { "Content-Type": "application/json" },
-      withCredentials: true,
-      data: {
-        email,
-        password,
-      },
-    })
-      .then((response) => {
-        // console.log(response);
-        this.setState(() => ({
-          user: response.data.user,
-        }));
-      })
-      .catch((err) => {
-        console.log(err.response);
-      });
-  };
+  // loginWithCredentials = ({ email, password }) => (e) => {
+  //   e.preventDefault();
+  //   return axios({
+  //     method: "POST",
+  //     url: API_LOGIN_ENDPOINT,
+  //     headers: { "Content-Type": "application/json" },
+  //     withCredentials: true,
+  //     data: {
+  //       email,
+  //       password,
+  //     },
+  //   })
+  //     .then((response) => {
+  //       // console.log(response);
+  //       this.setState(() => ({
+  //         currentUser: response.data.user,
+  //       }));
+  //     })
+  //     .catch((err) => {
+  //       console.log(err.response);
+  //     });
+  // };
 
   registerWithCredentials = (credentials) => (e) => {
     e.preventDefault();
@@ -84,47 +77,54 @@ class App extends Component {
             user: response.data.user,
           };
         });
+        document.location = "/";
       })
       .catch((err) => {
         console.log("error: ", err.response);
       });
   };
 
-  logOut = (e) => {
-    e.preventDefault();
-    return axios(API_LOGOUT_ENDPOINT, {
-      method: "GET",
-      withCredentials: true,
-    })
-      .then(() => {
-        console.log(this);
-        this.setState(() => ({
-          user: null,
-        }));
-      })
-      .catch(console.error);
-  };
+  // logOut = (e) => {
+  //   e.preventDefault();
+  //   return axios(API_LOGOUT_ENDPOINT, {
+  //     method: "GET",
+  //     withCredentials: true,
+  //   })
+  //     .then(() => {
+  //       console.log(this);
+  //       this.setState(() => ({
+  //         currentUser: null,
+  //       }));
+  //       document.location = '/';
+  //     })
+  //     .catch(console.error);
+  // };
 
   componentDidMount() {
-    this.checkLogInStatus()
-      .then((response) => {
-        console.log(response);
-        this.setState(() => ({
-          user: response.data.user,
-        }));
-      })
-      .catch();
+    const { dispatch } = this.props;
+    dispatch(checkLoggedInStatus());
+    //   .then((response) => {
+    //     console.log(response);
+    //     this.setState(() => ({
+    //       currentUser: response.data.user,
+    //     }));
+    //   })
+    //   .catch();
   }
 
   render() {
-    const { user } = this.state;
+    const { user } = this.props;
+    const { currentUser } = user;
+    console.log(currentUser)
+    console.log('current user: ', typeof currentUser);
     return (
       <>
-        <NavBar user={user} logOutHandler={this.logOut}></NavBar>
-        {user ? (
+        <NavBar user={currentUser}></NavBar>
+        {currentUser ? (
           <>
+            <Route exact path="/" render={() => <HomePage></HomePage>}></Route>
             <h1>Logged In As</h1>
-            <pre>{JSON.stringify(user, null, 2)}</pre>
+            <pre>{JSON.stringify(currentUser, null, 2)}</pre>
           </>
         ) : (
           <>
@@ -139,4 +139,10 @@ class App extends Component {
   }
 }
 
-export default App;
+const mapStateToProps = (state) => {
+  return {
+    user: state.user,
+  }
+};
+
+export default connect(mapStateToProps)(App);

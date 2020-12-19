@@ -1,10 +1,50 @@
-import React, { useState } from "react";
+import React from "react";
+import { connect } from 'react-redux';
 
-export default function RegisterForm({ registerWithCredentials }) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [passwordConfirm, setPasswordConfirm] = useState("");
-  const [name, setName] = useState("");
+class RegisterForm extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      email: '',
+      name: '',
+      password: '',
+      passwordConfirm: '',
+    }
+  }
+
+  handleEmailChange = (e) => {
+    this.setState(() => ({
+      email: e.target.value
+    }))
+  }
+
+  handleNameChange = (e) => {
+    this.setState(() => ({
+      name: e.target.value
+    }));
+  }
+
+  handlePasswordChange = (e) => {
+    this.setState(() => ({
+      password: e.target.value
+    }))
+  }
+
+  handlePasswordConfirmChange = (e) => {
+    this.setState(() => ({
+      passwordConfirm: e.target.value
+    }))
+  }
+
+  handleImageUrlChange = (e) => {
+    this.setState(() => ({
+      imageUrl: e.target.value
+    }))
+  }
+
+  render() {
+    const {email, name, password, passwordConfirm} = this.state;
+
   return (
     <div className="register-form__container">
       <h2>Register</h2>
@@ -14,39 +54,33 @@ export default function RegisterForm({ registerWithCredentials }) {
       <h4>name: {name}</h4>
       <form
         className="register-form"
-        onSubmit={registerWithCredentials({
-          email,
-          password,
-          passwordConfirm,
-          name,
-        })}
       >
         <input
           name="email"
           placeholder="email"
           type="email"
           required
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={this.handleEmailChange}
         />
         <input
           name="name"
           placeholder="name"
           type="text"
           required
-          onChange={(e) => setName(e.target.value)}
+          onChange={this.handleNameChange}
         />
         <input
           name="password"
           placeholder="password"
           type="password"
           required
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={this.handlePasswordChange}
         />
         <input
           name="passwordConfirm"
           placeholder="confirm password"
           type="password"
-          onChange={(e) => setPasswordConfirm(e.target.value)}
+          onChange={this.handlePasswordConfirmChange}
           required
         />
         <button type="submit">Register</button>
@@ -54,3 +88,7 @@ export default function RegisterForm({ registerWithCredentials }) {
     </div>
   );
 }
+
+}
+
+export default connect()(RegisterForm);

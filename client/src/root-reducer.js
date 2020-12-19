@@ -1,5 +1,6 @@
-import user from "./entities/user/User.reducers";
+import user from "./entities/user/user.reducers";
+import { combineReducers } from 'redux';
 
-export default () => ({
-  user,
+export default combineReducers({
+  user: user,
 });
