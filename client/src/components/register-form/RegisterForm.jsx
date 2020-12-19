@@ -1,6 +1,8 @@
 import React from "react";
 import { connect } from 'react-redux';
 
+import { register } from '../../entities/user/user.actions';
+
 class RegisterForm extends React.Component {
   constructor(props) {
     super(props);
@@ -44,6 +46,7 @@ class RegisterForm extends React.Component {
 
   render() {
     const {email, name, password, passwordConfirm} = this.state;
+    const {dispatch} = this.props;
 
   return (
     <div className="register-form__container">
@@ -54,6 +57,10 @@ class RegisterForm extends React.Component {
       <h4>name: {name}</h4>
       <form
         className="register-form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          dispatch(register({email, password, passwordConfirm, name}));
+        }}
       >
         <input
           name="email"
@@ -90,5 +97,6 @@ class RegisterForm extends React.Component {
 }
 
 }
+
 
 export default connect()(RegisterForm);

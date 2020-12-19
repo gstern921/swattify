@@ -55,61 +55,36 @@ class App extends Component {
   //     });
   // };
 
-  registerWithCredentials = (credentials) => (e) => {
-    e.preventDefault();
-    return axios({
-      method: "POST",
-      url: API_REGISTER_ENDPOINT,
-      headers: { "Content-Type": "application/json" },
-      withCredentials: true,
-      data: {
-        email: credentials.email,
-        name: credentials.name,
-        password: credentials.password,
-        passwordConfirm: credentials.passwordConfirm,
-      },
-    })
-      .then((response) => {
-        this.setState((prevState) => {
-          // console.log(prevState);
-          // console.log(response);
-          return {
-            user: response.data.user,
-          };
-        });
-        document.location = "/";
-      })
-      .catch((err) => {
-        console.log("error: ", err.response);
-      });
-  };
-
-  // logOut = (e) => {
+  // registerWithCredentials = (credentials) => (e) => {
   //   e.preventDefault();
-  //   return axios(API_LOGOUT_ENDPOINT, {
-  //     method: "GET",
+  //   return axios({
+  //     method: "POST",
+  //     url: API_REGISTER_ENDPOINT,
+  //     headers: { "Content-Type": "application/json" },
   //     withCredentials: true,
+  //     data: {
+  //       email: credentials.email,
+  //       name: credentials.name,
+  //       password: credentials.password,
+  //       passwordConfirm: credentials.passwordConfirm,
+  //     },
   //   })
-  //     .then(() => {
-  //       console.log(this);
-  //       this.setState(() => ({
-  //         currentUser: null,
-  //       }));
-  //       document.location = '/';
+  //     .then((response) => {
+  //       this.setState(() => {
+  //         return {
+  //           user: response.data.user,
+  //         };
+  //       });
+  //       document.location = "/";
   //     })
-  //     .catch(console.error);
+  //     .catch((err) => {
+  //       console.log("error: ", err.response);
+  //     });
   // };
 
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch(checkLoggedInStatus());
-    //   .then((response) => {
-    //     console.log(response);
-    //     this.setState(() => ({
-    //       currentUser: response.data.user,
-    //     }));
-    //   })
-    //   .catch();
   }
 
   render() {
@@ -130,7 +105,6 @@ class App extends Component {
           <>
             <LoginRegisterForm
               loginWithCredentials={this.loginWithCredentials}
-              registerWithCredentials={this.registerWithCredentials}
             ></LoginRegisterForm>
           </>
         )}

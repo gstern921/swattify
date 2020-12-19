@@ -7,7 +7,7 @@ import {
 } from "../../config/app.config";
 import axios from "axios";
 
-export const register = ({ email, password, passwordConfirm, name, imageUrl }) => (dispatch) => {
+export const register = ({ email, password, passwordConfirm, name }) => (dispatch) => {
   dispatch({
     type: UserActionTypes.REGISTER_PENDING,
   });
@@ -22,7 +22,6 @@ export const register = ({ email, password, passwordConfirm, name, imageUrl }) =
       password,
       passwordConfirm,
       name,
-      imageUrl
     },
   })
     .then((response) => {
