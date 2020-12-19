@@ -19,6 +19,9 @@ module.exports.MINIMUM_PASSWORD_LOWERCASE = 1;
 module.exports.MINIMUM_PASSWORD_DIGITS = 1;
 module.exports.MAXIMUM_PASSWORD_LENGTH = 128;
 
+module.exports.PROJECTS_QUERY_MAXIMUM_PAGE_SIZE = 20;
+module.exports.PROJECTS_QUERY_DEFAULT_PAGE_SIZE = 20;
+
 module.exports.SUCCESS = 'success';
 module.exports.FAIL = 'fail';
 module.exports.ERROR = 'error';

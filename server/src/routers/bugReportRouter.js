@@ -4,26 +4,33 @@ const {
   createBugReport,
   deleteBugReportById,
   getBugReportById,
-  updateBugReportById
+  updateBugReportById,
+  getAllBugReports,
 } = require('../controllers/bugReportController');
-const { createCommentForBugReportId } = require('../controllers/bugReportCommentController');
+
+const { createCommentForBugReportId, getBugReportCommentsByReportId } = require('../controllers/bugReportCommentController');
+
+const { paginate } = require('../middleware/queryMiddleware');
 
 const router = Router();
 
 router.use(ensureAuth);
 
-// Get Bug Report By ID
-router.get('/:bugReportId', (req, res) => getBugReportById(req.params.bugReportId)(req, res));
+router.get('/', paginate({ maximumPageSize: 20, defaultPageSize: 20 }), getAllBugReports);
 
 // Create Bug Report
-router.post('/:projectId', (req, res) => createBugReport(req.params.projectId)(req, res));
+router.post('/', (req, res) => createBugReport(req.body.projectId)(req, res));
+
+// Get Bug Report By ID
+router.get('/:bugReportId', (req, res) => getBugReportById(req.params.bugReportId)(req, res));
 
 // Delete Bug Report By ID
 router.delete('/:bugReportId', (req, res) => deleteBugReportById(req.params.bugReportId)(req, res));
 
 router.patch('/:bugReportId', (req, res) => updateBugReportById(req.params.bugReportId)(req, res));
 
-router.post('/:bugReportId/comment', (req, res, next) => createCommentForBugReportId(req.params.bugReportId)(req, res, next));
+router.get('/:bugReportId/comments', paginate({ maximumPageSize: 20, defaultPageSize: 20 }), (req, res) => getBugReportCommentsByReportId(req.params.bugReportId)(req, res));
 
+router.post('/:bugReportId/comments', (req, res) => createCommentForBugReportId(req.params.bugReportId)(req, res));
 
 module.exports = router;

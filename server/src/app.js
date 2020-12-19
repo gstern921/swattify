@@ -14,8 +14,6 @@ const { IS_PROD, CLIENT_URL, SESSION_COOKIE_NAME, SESSION_SECRET } = require('./
 const app = express();
 app.set('trust proxy', 1);
 
-app.use(express.static(path.join(__dirname, 'public')));
-
 if (!IS_PROD) {
   app.use(logger('dev'));
 }
@@ -51,16 +49,11 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use((req, res, next) => {
-  // console.log('req.user ', req.user);
-  // console.log('cookies:', req.cookies);
-  // console.log('authenticated?: ', req.isAuthenticated());
-  // console.log('unauthenticated?: ', req.isUnauthenticated());
-  // console.log('co');
+  // console.log(req.query)
   next();
 });
 
-app.use('/', require('./indexRouter'));
-app.use('/api/v1/user', require('./routers/userRouter'));
+app.use('/api/v1/users', require('./routers/userRouter'));
 app.use('/api/v1/projects', require('./routers/projectRouter'));
 app.use('/api/v1/bug-reports', require('./routers/bugReportRouter'));
 

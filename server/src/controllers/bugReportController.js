@@ -1,12 +1,25 @@
 const {
+  StatusCodes
+} = require('http-status-codes');
+const { BugReport, BugReportComment, sequelize, ProjectUsers } = require('../models');
+const { SUCCESS, ERROR, FAIL } = require('../config/app.config');
+const { catchAsync } = require('../utils');
+
+const {
   OK,
   INTERNAL_SERVER_ERROR,
   BAD_REQUEST,
   NOT_FOUND
-} = require('http-status-codes');
-const { BugReport, sequelize, ProjectUsers } = require('../models');
-const { SUCCESS, ERROR, FAIL } = require('../config/app.config');
-const { catchAsync } = require('../utils');
+} = StatusCodes;
+
+exports.getAllBugReports = catchAsync(async (req, res) => {
+  const bugReports = await BugReport.findAll({
+    // include: { model: BugReportComment, as: 'comments', attributes: { exclude: ['bugReportId'] }, limit: 1 },
+    limit: req.paginateLimit,
+    offset: req.paginateOffset,
+  });
+  return res.status(OK).json({ status: SUCCESS, data: bugReports });
+});
 
 exports.createBugReport = (projectId) => catchAsync(async (req, res) => {
   const {

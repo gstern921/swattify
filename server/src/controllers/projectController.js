@@ -1,20 +1,25 @@
-const { INTERNAL_SERVER_ERROR, OK, BAD_REQUEST } = require('http-status-codes');
+const { StatusCodes } = require('http-status-codes');
 const { SUCCESS, ERROR, FAIL } = require('../config/app.config');
 const { Project, User } = require('../models');
 const { catchAsync } = require('../utils/index');
 const db = require('../models').sequelize;
 
+const { INTERNAL_SERVER_ERROR, OK, BAD_REQUEST } = StatusCodes;
+
 exports.getAllProjectsByUserId = (userId) => async (req, res) => {
   try {
     const user = await User.findByPk(userId);
-    // console.log(user);
+    // console.log(ProjectUsers.findAll);
+    const totalCount = await user.countProjects();
     const projects = await user.getProjects({
       include: [{ model: User, through: { attributes: [] } }],
+      limit: req.paginateLimit,
+      offset: req.paginateOffset,
     });
     const count = projects.length;
-    return res.status(OK).json({ status: SUCCESS, count, message: 'Successfully found projects', data: { projects } });
+    return res.status(OK).json({ status: SUCCESS, count, totalCount, message: 'Successfully found projects', data: { projects } });
   } catch (err) {
-    return res.status(ERROR).json({ status: ERROR, message: 'Unable to find projects', data: null });
+    return res.status(INTERNAL_SERVER_ERROR).json({ status: ERROR, message: 'Unable to find projects', data: err });
   }
 };
 
@@ -75,7 +80,7 @@ exports.deleteProjectById = (projectId) => async (req, res) => {
         projectOwnerId: userId,
       },
     });
-    console.log(result);
+    console.log('project destroy result: ', result);
     if (!result) {
       return res.status(BAD_REQUEST).json({
         status: FAIL,
@@ -87,7 +92,7 @@ exports.deleteProjectById = (projectId) => async (req, res) => {
     return res.status(INTERNAL_SERVER_ERROR).json({
       status: ERROR,
       message: 'Unable to delete project, something went wrong',
-      data: null,
+      data: err,
     });
   }
 };

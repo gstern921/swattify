@@ -1,7 +1,21 @@
-const { OK, INTERNAL_SERVER_ERROR, BAD_REQUEST, NOT_FOUND, UNAUTHORIZED } = require('http-status-codes');
+const { StatusCodes } = require('http-status-codes');
 const { BugReport, sequelize, ProjectUsers, BugReportComment } = require('../models');
 const { SUCCESS, ERROR, FAIL } = require('../config/app.config');
 const { catchAsync } = require('../utils');
+const { OK, INTERNAL_SERVER_ERROR, BAD_REQUEST, NOT_FOUND, UNAUTHORIZED } = StatusCodes;
+
+exports.getBugReportCommentsByReportId = (bugReportId) => catchAsync(async (req, res) => {
+  const comments = await BugReportComment.findAll({
+    where: {
+      bugReportId,
+    },
+    limit: req.paginateLimit,
+    offset: req.paginateOffset,
+  });
+
+  return res.status(OK).json({ status: SUCCESS, data: comments });
+
+});
 
 exports.createCommentForBugReportId = (bugReportId) =>
   catchAsync(async (req, res, next) => {

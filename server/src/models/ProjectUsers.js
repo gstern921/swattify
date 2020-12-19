@@ -13,7 +13,8 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
 
     }
-  };
+  }
+
   ProjectUsers.init({
   }, {
     sequelize,
