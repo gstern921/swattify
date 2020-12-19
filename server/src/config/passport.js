@@ -18,6 +18,7 @@ module.exports = (passport) => {
           return done(null, false);
         }
         // Successful Log In
+        user.password = undefined;
         return done(null, user);
       } catch (e) {
         return done(e);

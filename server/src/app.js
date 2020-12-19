@@ -60,7 +60,7 @@ app.use((req, res, next) => {
 });
 
 app.use('/', require('./indexRouter'));
-app.use('/api/v1/me', require('./routers/meRouter'));
+app.use('/api/v1/user', require('./routers/userRouter'));
 app.use('/api/v1/projects', require('./routers/projectRouter'));
 app.use('/api/v1/bug-reports', require('./routers/bugReportRouter'));
 

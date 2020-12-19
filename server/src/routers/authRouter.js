@@ -1,9 +1,10 @@
 const express = require('express');
 const passport = require('passport');
-const { OK, BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND } = require('http-status-codes');
-const { CLIENT_URL, SUCCESS, FAIL, ERROR } = require('../config/app.config');
-const { ensureGuest, ensureAuth } = require('../middleware/authMiddleware');
+const { StatusCodes} = require('http-status-codes');
+const { CLIENT_URL, SUCCESS, FAIL, ERROR, SESSION_COOKIE_NAME } = require('../config/app.config');
+const { ensureGuest } = require('../middleware/authMiddleware');
 const User = require('../models/User');
+const { OK, BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND } = StatusCodes;
 
 const router = express.Router();
 
@@ -60,7 +61,7 @@ router.post('/login', ensureGuest, (req, res, next) => {
       if (err) {
         return res.status(INTERNAL_SERVER_ERROR).json({ status: ERROR, message: 'Login error' });
       }
-      return res.status(OK).json({ status: SUCCESS, user });
+      return res.status(OK).json({ status: SUCCESS, data: user });
     });
   })(req, res, next);
 });
@@ -73,6 +74,7 @@ router.get('/test', (req, res) => {
 router.get('/logout', (req, res) => {
   console.log('logout user: ', req.user);
   req.logOut();
+  res.clearCookie(SESSION_COOKIE_NAME);
   res.status(OK).json({ status: SUCCESS });
 });
 
