@@ -9,9 +9,6 @@ import {
 } from "react-router-dom";
 
 import { connect } from "react-redux";
-
-import HomePage from "./pages/home-page/HomePage";
-
 import axios from "axios";
 
 import {
@@ -25,62 +22,18 @@ import NavBar from "./components/navbar/NavBar";
 
 import React, { Component } from "react";
 import LoginRegisterForm from "./containers/login-register-form/LoginRegisterForm";
+import Project from './pages/project-page/Project';
+import Home from "./pages/home-page/Home";
+import MyProjects from './pages/my-projects/MyProjects';
+
+
 import {checkLoggedInStatus} from "./entities/user/user.actions";
 
 class App extends Component {
+  
   constructor(props) {
     super(props);
   }
-
-  // loginWithCredentials = ({ email, password }) => (e) => {
-  //   e.preventDefault();
-  //   return axios({
-  //     method: "POST",
-  //     url: API_LOGIN_ENDPOINT,
-  //     headers: { "Content-Type": "application/json" },
-  //     withCredentials: true,
-  //     data: {
-  //       email,
-  //       password,
-  //     },
-  //   })
-  //     .then((response) => {
-  //       // console.log(response);
-  //       this.setState(() => ({
-  //         currentUser: response.data.user,
-  //       }));
-  //     })
-  //     .catch((err) => {
-  //       console.log(err.response);
-  //     });
-  // };
-
-  // registerWithCredentials = (credentials) => (e) => {
-  //   e.preventDefault();
-  //   return axios({
-  //     method: "POST",
-  //     url: API_REGISTER_ENDPOINT,
-  //     headers: { "Content-Type": "application/json" },
-  //     withCredentials: true,
-  //     data: {
-  //       email: credentials.email,
-  //       name: credentials.name,
-  //       password: credentials.password,
-  //       passwordConfirm: credentials.passwordConfirm,
-  //     },
-  //   })
-  //     .then((response) => {
-  //       this.setState(() => {
-  //         return {
-  //           user: response.data.user,
-  //         };
-  //       });
-  //       document.location = "/";
-  //     })
-  //     .catch((err) => {
-  //       console.log("error: ", err.response);
-  //     });
-  // };
 
   componentDidMount() {
     const { dispatch } = this.props;
@@ -89,15 +42,18 @@ class App extends Component {
 
   render() {
     const { user } = this.props;
-    const { currentUser } = user;
+    const { currentUser, errorMessage } = user;
     console.log(currentUser)
     console.log('current user: ', typeof currentUser);
     return (
       <>
         <NavBar user={currentUser}></NavBar>
+        {errorMessage && <p>{errorMessage}</p>}
         {currentUser ? (
           <>
-            <Route exact path="/" render={() => <HomePage></HomePage>}></Route>
+            <Route exact path="/"  component={Home}></Route>
+            <Route exact path="/project/:projectId"  component={Project}></Route>
+            <Route exact path="/my-projects" component={MyProjects}></Route>
             <h1>Logged In As</h1>
             <pre>{JSON.stringify(currentUser, null, 2)}</pre>
           </>

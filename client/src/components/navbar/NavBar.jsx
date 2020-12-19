@@ -7,7 +7,13 @@ export default function NavBar({ user }) {
   return (
     <div className="nav-bar__container">
       <h1>Swattify</h1>
-      {user && <LogOutButton></LogOutButton>}
+      { user ?
+      <>
+      <Link to="/my-projects">Projects</Link>
+      
+      <LogOutButton></LogOutButton>
+      </>
+      : null}
     </div>
   );
 }

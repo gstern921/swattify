@@ -34,7 +34,7 @@ export const register = ({ email, password, passwordConfirm, name }) => (dispatc
     .catch((err) => {
       dispatch({
         type: UserActionTypes.REGISTER_FAILURE,
-        payload: err.response,
+        payload: err.response.data.message,
       });
     });
 };
@@ -62,9 +62,10 @@ export const login = ({ email, password }) => (dispatch) => {
 
     })
     .catch((err) => {
+      console.log(err)
       dispatch({
         type: UserActionTypes.LOGIN_FAILURE,
-        payload: err.response,
+        payload: err.response.data.message,
       });
     });
 };
@@ -83,7 +84,7 @@ export const logout = () => (dispatch) => {
       console.log(response);
     })
     .catch((err) => {
-      dispatch({ type: UserActionTypes.LOGOUT_FAILURE });
+      dispatch({ type: UserActionTypes.LOGOUT_FAILURE, payload: err.response.data.message });
     });
 };
 
