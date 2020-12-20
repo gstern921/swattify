@@ -1,6 +1,7 @@
 const { StatusCodes } = require('http-status-codes');
 const { FAIL, SUCCESS } = require('../config/app.config');
 const { ProjectUsers } = require('../models');
+const AppError = require('../utils/appError');
 
 const { BAD_REQUEST, UNAUTHORIZED, OK } = StatusCodes;
 
@@ -25,22 +26,21 @@ module.exports = {
     const userId = req.user.id;
     const projectId = req.params[projectIdParamName];
 
-    const projects = await ProjectUsers.findAll({
+    const project = await ProjectUsers.findOne({
       where: {
         userId,
         projectId,
-      },
-      limit: 1,
+      }
     });
 
-    const isMember = projects.length > 0;
+    console.log(project);
+
+    const isMember = !!project;
     console.log('isMember: ', isMember);
 
-    // console.log('ProjectUsers: ', ProjectUsers.find);
-    // console.log('isMember: ', isMember);
-
     if (!isMember) {
-      return res.status(UNAUTHORIZED).json({ status: FAIL, message: 'You are not a member of that project' });
+      return next(new AppError('You are not a member of that project', UNAUTHORIZED, FAIL));
+      // return res.status(UNAUTHORIZED).json({ status: FAIL, message: 'You are not a member of that project' });
     }
 
     return next();

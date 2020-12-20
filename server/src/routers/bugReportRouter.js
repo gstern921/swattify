@@ -8,9 +8,16 @@ const {
   getAllBugReports,
 } = require('../controllers/bugReportController');
 
+const {
+  BUG_REPORT_SORTABLE_FIELDS,
+  BUG_REPORT_SELECTABLE_FIELDS,
+  BUG_REPORT_COMMENT_SELECTABLE_FIELDS,
+  BUG_REPORT_COMMENT_SORTABLE_FIELDS
+} = require('../config/app.config');
+
 const { createCommentForBugReportId, getBugReportCommentsByReportId } = require('../controllers/bugReportCommentController');
 
-const { paginate, sort } = require('../middleware/queryMiddleware');
+const { paginate, sort, selectFields } = require('../middleware/queryMiddleware');
 
 const router = Router();
 
@@ -18,7 +25,8 @@ router.use(ensureAuth);
 
 router.get('/',
   paginate({ maximumPageSize: 20, defaultPageSize: 20 }),
-  sort(['createdAt', 'updatedAt', 'name', 'description', 'severity', 'priority', 'status']),
+  sort(BUG_REPORT_SORTABLE_FIELDS),
+  selectFields(BUG_REPORT_SELECTABLE_FIELDS),
   getAllBugReports);
 
 // Create Bug Report
@@ -34,8 +42,10 @@ router.patch('/:bugReportId', (req, res) => updateBugReportById(req.params.bugRe
 
 router.get('/:bugReportId/comments',
   paginate({ maximumPageSize: 20, defaultPageSize: 20 }),
+  sort(BUG_REPORT_COMMENT_SORTABLE_FIELDS),
+  selectFields(BUG_REPORT_COMMENT_SELECTABLE_FIELDS),
   (req, res) => getBugReportCommentsByReportId(req.params.bugReportId)(req, res));
 
-router.post('/:bugReportId/comments', (req, res) => createCommentForBugReportId(req.params.bugReportId)(req, res));
+router.post('/:bugReportId/comments', (req, res, next) => createCommentForBugReportId(req.params.bugReportId)(req, res, next));
 
 module.exports = router;

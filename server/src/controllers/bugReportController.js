@@ -7,11 +7,14 @@ const { OK, INTERNAL_SERVER_ERROR, BAD_REQUEST, NOT_FOUND } = StatusCodes;
 
 exports.getAllBugReports = catchAsync(async (req, res) => {
   try {
-    const {count: totalCount, rows: bugReports} = await BugReport.findAndCountAll({
-      // include: { model: BugReportComment, as: 'comments', attributes: { exclude: ['bugReportId'] } },
+    console.log('req.includedFields: ', req.includedFields);
+
+    const { count: totalCount, rows: bugReports } = await BugReport.findAndCountAll({
+      // include: { model: BugReportComment, as: 'comments', separate: true },
       limit: req.paginateLimit,
       offset: req.paginateOffset,
       order: req.sortFields,
+      attributes: req.includedFields,
     });
     return res.status(OK).json({
       status: SUCCESS,

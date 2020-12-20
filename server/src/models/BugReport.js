@@ -12,8 +12,8 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       BugReport.hasMany(models.BugReportComment, { as: 'comments',
-      foreignKey: { name: 'bugReportId', allowNull: false }
-    });
+        foreignKey: { name: 'bugReportId', allowNull: false },
+      });
 
       BugReport.belongsTo(models.User, {
         foreignKey: {

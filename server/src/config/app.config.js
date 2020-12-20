@@ -22,6 +22,31 @@ module.exports.MAXIMUM_PASSWORD_LENGTH = 128;
 module.exports.PROJECTS_QUERY_MAXIMUM_PAGE_SIZE = 20;
 module.exports.PROJECTS_QUERY_DEFAULT_PAGE_SIZE = 20;
 
+module.exports.USER_PAGINATE_OPTIONS = {
+  maximumPageSize: 20,
+  defaultPageSize: 20,
+};
+
+module.exports.USER_SELECTABLE_FIELDS = [
+  'name', 'description', 'logoUrl', 'projectOwnerId'
+];
+
+module.exports.BUG_REPORT_SORTABLE_FIELDS = [
+  'createdAt', 'updatedAt', 'name', 'description',
+  'severity', 'priority', 'status',
+];
+module.exports.BUG_REPORT_SELECTABLE_FIELDS = [
+  'id', 'creator', 'name', 'description', 'severity', 'priority',
+  'status', 'project', 'updatedAt', 'createdAt',
+];
+
+module.exports.BUG_REPORT_COMMENT_SORTABLE_FIELDS = [
+  'id', 'text', 'bugReportId', 'name', 'updatedAt', 'createdAt',
+];
+module.exports.BUG_REPORT_COMMENT_SELECTABLE_FIELDS = [
+  'id', 'text', 'bugReportId', 'name', 'updatedAt', 'createdAt',
+];
+
 module.exports.SUCCESS = 'success';
 module.exports.FAIL = 'fail';
 module.exports.ERROR = 'error';

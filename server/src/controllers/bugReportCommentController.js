@@ -4,26 +4,30 @@ const { SUCCESS, ERROR, FAIL } = require('../config/app.config');
 const { catchAsync } = require('../utils');
 const { OK, INTERNAL_SERVER_ERROR, BAD_REQUEST, NOT_FOUND, UNAUTHORIZED } = StatusCodes;
 
-exports.getBugReportCommentsByReportId = (bugReportId) => catchAsync(async (req, res) => {
-  try {
-    const { totalCount, rows } = await BugReportComment.findAndCountAll({
-      where: {
-        bugReportId,
-      },
-      limit: req.paginateLimit,
-      offset: req.paginateOffset,
-    });
-    const count = rows.length;
-    return res.status(OK).json({
-      status: SUCCESS,
-      count,
-      data: rows,
-      totalCount,
-    });
-  } catch (err) {
-    return res.status(INTERNAL_SERVER_ERROR).json({ status: ERROR, message: 'Something went wrong'});
-  }
-});
+exports.getBugReportCommentsByReportId = (bugReportId) =>
+  catchAsync(async (req, res) => {
+    try {
+      const { totalCount, rows } = await BugReportComment.findAndCountAll({
+        where: {
+          bugReportId,
+        },
+        limit: req.paginateLimit,
+        offset: req.paginateOffset,
+        order: req.sortFields,
+        attributes: req.includedFields,
+
+      });
+      const count = rows.length;
+      return res.status(OK).json({
+        status: SUCCESS,
+        count,
+        data: rows,
+        totalCount,
+      });
+    } catch (err) {
+      return res.status(INTERNAL_SERVER_ERROR).json({ status: ERROR, message: 'Something went wrong' });
+    }
+  });
 
 exports.createCommentForBugReportId = (bugReportId) =>
   catchAsync(async (req, res, next) => {
@@ -58,15 +62,17 @@ exports.createCommentForBugReportId = (bugReportId) =>
             data: null,
           });
         }
-
         const bugReportComment = await BugReportComment.create(
           { text, userId: user.id, bugReportId: bugReport.id },
           { transaction },
         );
+        if (bugReportComment) {
+          return res
+            .status(OK)
+            .json({ status: SUCCESS, message: 'Comment created successfully', data: { comment: bugReportComment } });
+        }
         return bugReportComment;
       });
-
-      res.status(OK).json({ status: SUCCESS, message: 'Comment created successfully', data: { comment: newComment } });
     } catch (err) {
       return res
         .status(INTERNAL_SERVER_ERROR)
@@ -74,10 +80,7 @@ exports.createCommentForBugReportId = (bugReportId) =>
     }
   });
 
-exports.deleteBugReportCommentById = (id) => catchAsync(async (req, res) => {
-
-
-});
+exports.deleteBugReportCommentById = (id) => catchAsync(async (req, res) => {});
 
 exports.getBugReportCommentById = (id) => catchAsync(async (req, res) => {});
 

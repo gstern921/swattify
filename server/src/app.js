@@ -64,16 +64,16 @@ app.use('/api/v1/bug-reports', require('./routers/bugReportRouter'));
 // app.use('/users', require('./routes/users'));
 app.use('/api/v1/auth', require('./routers/authRouter'));
 
-app.use((err, req, res, next) => {
+app.use('*', (err, req, res, next) => {
   if (!IS_PROD) {
     if (err.isOperational) {
-      return res.status(err.status).json({ status: err.responseStatus, message: err.message, err });
+      return res.status(err.statusCode).json({ status: err.statusText, message: err.message, err });
     }
     return res.status(INTERNAL_SERVER_ERROR).json({ status: ERROR, err });
   }
 
   if (err.isOperational) {
-    return res.status(err.status).json({ status: err.responseStatus, message: err.message });
+    return res.status(err.statusCode).json({ status: err.statusText, message: err.message });
   }
   return res.status(500).json({ status: ERROR, message: 'Something went wrong' });
 });
